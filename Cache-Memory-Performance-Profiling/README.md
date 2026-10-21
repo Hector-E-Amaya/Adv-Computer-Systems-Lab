@@ -16,7 +16,7 @@ rubric allows as "an equivalent memory benchmark".
 
 ## Status
 - [x] Step 1: repo skeleton and environment capture (`data/raw/env.txt`, `env_notes.txt`)
-- [ ] Step 2: pre-experiment hypotheses
+- [x] Step 2: pre-experiment hypotheses (`reports/HYPOTHESES.md`)
 - [ ] Batch 1: benchmarks, build, correctness/sanity tests
 - [ ] Batch 2: sweeps + VTune counter runs
 - [ ] Batch 3: analysis, plots, AMAT / Little's Law, pitfall demo
