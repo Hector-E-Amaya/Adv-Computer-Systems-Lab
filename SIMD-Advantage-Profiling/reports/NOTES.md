@@ -30,6 +30,10 @@
   with 0 `vgather`/`vscatter`, even at -march=tigerlake. GCC emulates the
   strided access with scalar loads/stores plus inserts, so expect little or no
   SIMD gain at stride > 1 (H6).
+  **Corrected in Batch 4:** this was wrong. GCC versions the loop on
+  `stride == 1` (`cmpq $1, %rdx; jne`). Only that case is vectorized, and
+  stride > 1 runs a plain scalar loop. Found by reading the loop that
+  actually executes, not just the first loop in the function.
 - Bench CSV output switched to binary stdout (LF only). Windows text-mode
   stdout was emitting CRLF.
 - Quick smoke sweep (3 trials, 5 ms; indicative only):

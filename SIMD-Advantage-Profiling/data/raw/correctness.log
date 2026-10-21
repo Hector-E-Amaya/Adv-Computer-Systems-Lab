@@ -1,4 +1,4 @@
-# correctness run 2026-10-21T19:36:47Z, commit d3edc3e
+# correctness run 2026-10-21T20:03:38Z, commit 1b47451
 # err and tol in units of eps * sum|terms|
 PASS scalar saxpy f32 n=1 stride=1 misalign=0 err=0.136 tol=8 (eps units)
 PASS scalar saxpy f32 n=2 stride=1 misalign=0 err=0.322 tol=8 (eps units)

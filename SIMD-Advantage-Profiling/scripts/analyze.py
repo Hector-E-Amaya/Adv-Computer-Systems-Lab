@@ -75,7 +75,8 @@ def summarize(d, keys):
     """Median over reps of the per-row metrics, spread of t_med across reps."""
     g = d.groupby(keys + ["build"])
     s = g.agg(t_ns=("t_med_ns", "median"), t_lo=("t_med_ns", "min"), t_hi=("t_med_ns", "max"),
-              gflops=("gflops", "median"), gbps=("gbps", "median"),
+              gflops=("gflops", "median"), gf_lo=("gflops", "min"), gf_hi=("gflops", "max"),
+              gbps=("gbps", "median"), bw_lo=("gbps", "min"), bw_hi=("gbps", "max"),
               cpe=("cycles_per_elem", "median"), ns_per_elem=("ns_per_elem", "median"),
               ghz=("ghz_before", "median"), reps=("rep", "nunique")).reset_index()
     s["cv_pct"] = 100 * g.t_med_ns.std().values / s.t_ns
@@ -147,7 +148,7 @@ def size_sweep(d, out):
                     build_lines(ax, t, "n", "speedup", "sp_lo", "sp_hi")
                     ax.axhline(1, color=INK2, lw=0.8)
                 else:
-                    build_lines(ax, t, "n", "gflops")
+                    build_lines(ax, t, "n", "gflops", "gf_lo", "gf_hi")
                     ax.set_yscale("log")
                 ax.set_xscale("log", base=2)
                 cache_lines(ax, k, dt)
@@ -197,6 +198,8 @@ def size_sweep(d, out):
     fig.tight_layout()
     save(fig, "dot_negative.png")
 
+    locality_figure(s)
+
     # regime table: median over the points inside each regime
     r = s[s.regime != "transition"].groupby(["kernel", "dtype", "build", "regime"]).agg(
         speedup=("speedup", "median"), gflops=("gflops", "median"), cpe=("cpe", "median"),
@@ -206,12 +209,54 @@ def size_sweep(d, out):
     out["regime"] = r
 
 
+def locality_figure(s, kernel="saxpy", dtype="f32"):
+    """One kernel across the hierarchy, annotated with where the SIMD gain compresses."""
+    t = s[(s.kernel == kernel) & (s.dtype == dtype)]
+    per_elem = NBUF[kernel] * ESIZE[dtype]
+    bounds = [64, *(cap / per_elem for _, cap in CACHES), t.n.max() * 1.2]
+    fig, (ax, ax2) = plt.subplots(2, 1, figsize=(9, 6.6), sharex=True,
+                                  gridspec_kw={"height_ratios": [3, 2]})
+    for i, name in enumerate(["L1", "L2", "L3", "DRAM"]):
+        for a in (ax, ax2):
+            a.axvspan(bounds[i], bounds[i + 1], color=INK2, alpha=0.05 if i % 2 else 0.0, lw=0)
+        ax.text((bounds[i] * bounds[i + 1]) ** 0.5, 1.0, name, transform=ax.get_xaxis_transform(),
+                ha="center", va="bottom", fontsize=8, color=INK2)
+    build_lines(ax, t, "n", "gflops", "gf_lo", "gf_hi")
+    build_lines(ax2, t, "n", "speedup", "sp_lo", "sp_hi")
+    ax.set_yscale("log")
+    ax.set_xscale("log", base=2)
+    ax.set_ylabel("GFLOP/s")
+    ax2.set_ylabel("speedup vs scalar")
+    ax2.set_xlabel("N (elements)")
+    ax2.axhline(1, color=INK2, lw=0.8)
+    ax2.set_ylim(0, t.sp_hi.max() * 1.45)  # headroom for the notes above the curves
+
+    def sp(build, reg):
+        u = t[(t.build == build) & (t.regime == reg)]
+        return u.speedup.median()
+    notes = [
+        (512, f"L1: speedup tracks lanes\n(avx512 {sp('avx512', 'L1'):.1f}x, avx2 {sp('avx2', 'L1'):.1f}x)\n"
+              "~2 cycles per vector iteration\nat every width"),
+        (20000, f"L2: gains compress\n(avx512 {sp('avx512', 'L2'):.1f}x)"),
+        (400000, f"L3: SIMD builds tie\n(L3 bandwidth, {sp('avx2', 'L3'):.1f}x)"),
+        (6e6, f"DRAM: memory-bound,\nscalar too ({sp('avx2', 'DRAM'):.2f}x)"),
+    ]
+    for x, text in notes:
+        ax2.text(x, ax2.get_ylim()[1] * 0.97, text, ha="center", va="top", fontsize=7, color=INK)
+    fig.suptitle(f"Locality sweep: {kernel} {dtype}; band = min..max over repetitions",
+                 x=0.02, ha="left", fontsize=10)
+    ax.legend(fontsize=7, ncol=4, loc="lower left")
+    fig.tight_layout(rect=(0, 0, 1, 0.97))
+    save(fig, f"locality_{kernel}_{dtype}.png")
+
+
 def align_sweep(d, out):
     keys = ["kernel", "dtype", "n", "misalign"]
     s = summarize(d, keys)
     base = s[s.misalign == 0][["kernel", "dtype", "n", "build", "t_ns"]].rename(columns={"t_ns": "t0"})
     s = s.merge(base, on=["kernel", "dtype", "n", "build"])
     s["rel_time"] = s.t_ns / s.t0
+    s["rel_lo"], s["rel_hi"] = s.t_lo / s.t0, s.t_hi / s.t0  # rep spread, relative to aligned median
     s["regime"] = (s.n * s.kernel.map(NBUF) * s.dtype.map(ESIZE)).map(regime)
     s.to_csv(PROC / "align_summary.csv", index=False)
     for dt in ["f32", "f64"]:
@@ -221,7 +266,7 @@ def align_sweep(d, out):
             for j, k in enumerate(["saxpy", "mul"]):
                 ax = axes[i, j]
                 t = s[(s.kernel == k) & (s.dtype == dt) & (s.n == n)]
-                build_lines(ax, t, "misalign", "rel_time")
+                build_lines(ax, t, "misalign", "rel_time", "rel_lo", "rel_hi")
                 ax.axhline(1, color=INK2, lw=0.8)
                 reg = t.regime.iloc[0] if len(t) else ""
                 ax.set_title(f"{k} {dt}, N={n} ({reg})", loc="left", fontsize=9)
@@ -268,8 +313,10 @@ def stride_sweep(d, out):
                 u = t[t.build == b].sort_values("stride")
                 axes[0, j].plot(u.stride, u.gbps, color=COLOR[b], marker=MARKER[b], ls=mk,
                                 label=f"{b} {dt}")
+                axes[0, j].fill_between(u.stride, u.bw_lo, u.bw_hi, color=COLOR[b], alpha=0.12, lw=0)
                 axes[1, j].plot(u.stride, u.speedup, color=COLOR[b], marker=MARKER[b], ls=mk,
                                 label=f"{b} {dt}")
+                axes[1, j].fill_between(u.stride, u.sp_lo, u.sp_hi, color=COLOR[b], alpha=0.12, lw=0)
         axes[0, j].set_title(f"saxpy, N={n}: useful GB/s (solid f32, dashed f64)",
                              loc="left", fontsize=9)
         axes[0, j].set_yscale("log")

@@ -32,9 +32,14 @@ measurement.
 - **sse2 / avx2 / avx512:** every unit-stride kernel uses the full register
   width of its build (xmm 16 B, ymm 32 B, zmm 64 B). avx2/avx512 use FMA
   (`vfmadd*ps`), since `-ffp-contract=fast` is set explicitly.
-- **Strided saxpy** is reported "vectorized" but has **no gather/scatter
-  instructions** in any build. GCC emulates the strided access with scalar
-  loads plus inserts. This matters in Section 5.
+- **Strided saxpy** is reported "vectorized", but only for a special case.
+  GCC *versions the loop on the stride*: every build begins with
+  `cmpq $1, %rdx; jne`. The vector loop runs only when stride == 1 at run
+  time. Any other stride takes a plain scalar loop (`vmovss` /
+  `vfmadd213ss` / `vmovss` in avx2). There are no gather/scatter
+  instructions in any build. So "loop vectorized" in the compiler report
+  says nothing about the stride > 1 path that actually runs. This matters
+  in Section 5.
 - **Plain dot** is compiled as an *in-order* reduction (Section 7).
 
 ## 2. Locality: where the SIMD gain lives (H1, H2, H3, H7)
@@ -138,9 +143,9 @@ Figure: `plots/stride.png`.
 **The SIMD gain disappears at stride 2.** With N=1024 (in cache at every
 stride), avx512 saxpy f32 is 11.1x scalar at stride 1 and 1.07x at stride 2.
 Every stride >= 2 sits at 0.90-1.07x for every build and both dtypes. In
-cache this is not a memory effect. GCC emulates strided accesses with scalar
-loads and inserts (no gathers; Section 1), so the strided "vector" loop does
-scalar work.
+cache this is not a memory effect. For stride > 1, GCC's
+runtime stride check selects its scalar fallback loop (Section 1), so every
+build runs the same scalar code.
 
 **Useful bandwidth in DRAM (N=2M) falls with stride, and does not flatten.**
 
@@ -243,8 +248,11 @@ single vector accumulator. Several independent accumulators, or `-ffast-math`
 unrolling, could approach the L1 load limit instead. We did not test this.
 
 **Second negative case: strided access** (Section 5). The compiler reports
-the loop vectorized, yet it runs at scalar speed, because without gathers
-every element is loaded individually.
+the loop vectorized, yet at stride > 1 it runs at scalar speed. The
+vectorized copy is guarded by a stride == 1 check, so the code that executes
+is scalar. This is a loop that "appears SIMD-friendly", and that even the
+compiler report calls vectorized, but it is not vectorized where it matters.
+Only the disassembly shows it.
 
 ## 8. Anomalies and threats to validity
 
