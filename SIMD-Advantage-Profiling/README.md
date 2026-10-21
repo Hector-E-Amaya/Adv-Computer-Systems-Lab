@@ -7,7 +7,7 @@ ECSE 4320/6320 Advanced Computer Systems, class-wide project.
 - `data/raw/`       raw measurements (CSV), correctness log, environment capture
 - `data/processed/` aggregated statistics
 - `plots/`          generated figures
-- `reports/`        hypotheses, AI-USE.md, REPORT.md
+- `reports/`        hypotheses, working notes, AI-USE.md, REPORT.md
 
 ## Quick start (Windows, Git Bash + MSYS2 UCRT64 gcc)
 ```bash
@@ -18,7 +18,7 @@ scripts/test.sh    # validates every build/kernel/dtype vs a long-double referen
 ## Status
 - [x] Step 1: repo skeleton and environment capture
 - [x] Step 2: pre-experiment hypotheses (`reports/HYPOTHESES.md`)
-- [ ] Batch 1: kernels, harness, build, correctness tests
+- [x] Batch 1: kernels, harness, build, correctness tests
 - [ ] Batch 2: vectorization verification and experiment sweeps
 - [ ] Batch 3: analysis, plots, roofline, negative case
 - [ ] Batch 4: AI-USE.md and REPORT.md
