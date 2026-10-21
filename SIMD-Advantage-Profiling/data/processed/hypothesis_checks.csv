@@ -1,0 +1,20 @@
+hypothesis,measure,value,predicted,verdict
+H1,"saxpy f32 avx2 speedup, L1",6.021807656630895,4..8,consistent
+H1,"saxpy f32 sse2 speedup, L1",3.0324034787791985,2..4,consistent
+H2,"saxpy f32 avx2 speedup, DRAM",1.0470890326403635,1.1..1.6,NOT consistent
+H2,"mul f32 avx2 speedup, DRAM",1.0473585251794324,1.1..1.6,NOT consistent
+H4,"saxpy avx2 f64/f32 element rate, L1",0.4978425711475618,0.4..0.6,consistent
+H4,"saxpy avx2 f64/f32 element rate, DRAM",0.4689988141622904,0.4..0.6,consistent
+H7,"saxpy f32 avx512/avx2, L1",1.7858980550309012,0..1.2,NOT consistent
+H7,"saxpy f32 avx512/avx2, DRAM",0.9996755480641125,0.9..1.1,consistent
+H8,"plain dot f32 sse2 speedup, L1",1.0831310215106678,0.8..1.2,consistent
+H8,"plain dot f32 avx2 speedup, L1",1.0625094262789576,0.8..1.2,consistent
+H8,"plain dot f32 avx512 speedup, L1",1.0245953403125718,0.8..1.2,consistent
+H8,"dot_simd f32 avx2 speedup, DRAM",2.939028320850898,0.8..1.6,NOT consistent
+H5,"worst misaligned/aligned time, avx512 f32, L1",1.9332880861301607,1..1.3,NOT consistent
+H5,"worst misaligned/aligned time, avx512 f32, L2",1.5350967276898513,1..1.3,NOT consistent
+H5,"worst misaligned/aligned time, avx512 f32, DRAM",1.0913276956135962,0.95..1.05,NOT consistent
+H5,avx2 cycles/elem at N=17 vs N=128 (tail cost),3.113570763609826,1.5..50,consistent
+H5,avx512 cycles/elem at N=17 vs N=128 (tail cost),4.277020877382136,1.5..50,consistent
+H6,"avx2 f32 DRAM useful GB/s, stride 1 / stride 16",19.385022041171403,8..20,consistent
+H6,avx2 f32 DRAM speedup at stride 2,1.0304764528762325,0.8..1.2,consistent

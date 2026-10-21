@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the four benchmark variants (scalar, sse2, avx2, avx512).
+# Build the four benchmark variants (scalar, sse2, avx2, avx512) and build/peak.exe.
 # Also writes, per build:
 #   build/asm/kernels_<build>.s        kernel assembly (vectorization evidence)
 #   build/vecinfo/kernels_<build>.txt  gcc -fopt-info-vec report (vectorized + missed)
@@ -37,4 +37,9 @@ for b in scalar sse2 avx2 avx512; do
     $CC build/kernels_$b.o build/bench_$b.o -o build/bench_$b.exe -lm
     ./build/bench_$b.exe --info
 done
+# Roofline ceilings: intrinsics only, so no auto-vectorization and no contraction.
+echo "[peak]"
+PEAKFLAGS="-O3 -std=gnu11 -march=tigerlake -ffp-contract=off -fno-tree-vectorize -fno-tree-slp-vectorize -Wall -Wextra $WINFIX"
+$CC $PEAKFLAGS src/peak.c -o build/peak.exe
+$CC $PEAKFLAGS -S src/peak.c -o build/asm/peak.s
 echo "build OK"

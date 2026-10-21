@@ -1,0 +1,11 @@
+== size -> data/raw/sweep_size.csv (15:01:07)
+   rep 1 f32 done (15:05:22)
+   rep 1 f64 done (15:09:48)
+   rep 2 f32 done (15:14:04)
+   rep 2 f64 done (15:18:23)
+   rep 3 f32 done (15:22:32)
+   rep 3 f64 done (15:26:58)
+== align -> data/raw/sweep_align.csv (15:26:58)
+== tail -> data/raw/sweep_tail.csv (15:30:40)
+== stride -> data/raw/sweep_stride.csv (15:34:14)
+finished 15:36:18; invalid rows: 0

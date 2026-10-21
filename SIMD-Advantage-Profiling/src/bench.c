@@ -12,7 +12,9 @@
  */
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <fcntl.h>
 #include <float.h>
+#include <io.h>
 #include <malloc.h>
 #include <math.h>
 #include <stdint.h>
@@ -374,6 +376,8 @@ static void print_info(void)
 int main(int argc, char **argv)
 {
     struct opts o = {.kernel = -1, .f64 = -1, .cpu = 2, .trials = 7, .stride = 1, .min_time = 0.02};
+
+    _setmode(_fileno(stdout), _O_BINARY); /* LF line endings in CSV output */
 
     for (int i = 1; i < argc; i++) {
         const char *a = argv[i], *v = i + 1 < argc ? argv[i + 1] : NULL;
