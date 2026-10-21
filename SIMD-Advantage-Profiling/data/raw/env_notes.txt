@@ -1,0 +1,4 @@
+Manual notes (not detectable by script):
+- Windows power mode slider: Best performance (powercfg still reports the Balanced scheme)
+- Laptop plugged in (AC power) for all measurement runs
+- Terminal: Git Bash inside VS Code, gcc from MSYS2 UCRT64 on PATH
