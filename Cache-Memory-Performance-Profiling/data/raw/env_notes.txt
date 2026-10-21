@@ -1,0 +1,12 @@
+Manual notes (not detectable by script):
+- Same laptop as Project 1 (Intel Core i3-1125G4, Windows 11 Home).
+- Windows power mode slider: Best performance (powercfg still reports the Balanced scheme)
+- Laptop plugged in (AC power) for all measurement runs
+- Terminal: Git Bash inside VS Code, gcc from MSYS2 UCRT64 on PATH
+- Memory: one 8 GB DDR4-3200 SODIMM in a 2-slot system -> single channel,
+  theoretical peak 3200 MT/s x 8 B = 25.6 GB/s. No NUMA (single socket).
+- Counters: Intel VTune Profiler (installed by the student as administrator)
+  will be used in place of Linux perf. VBS / memory integrity is running,
+  which may restrict hardware event sampling; see the counter check in Batch 2.
+- Intel MLC not used: the rubric allows "an equivalent memory benchmark";
+  latency/bandwidth tools are written in src/.
