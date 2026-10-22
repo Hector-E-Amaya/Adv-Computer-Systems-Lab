@@ -212,6 +212,52 @@ means the report has numbers.
 - `check_interference.py --dir data/raw/run1_interfered` reproduces the
   flagging byte-for-byte.
 
+### Full sweep run 2 (quiet, 2026-10-22 01:42-02:04): the dataset
+- 936 rows, 0 invalid. The machine was quiet (Edge closed, student away, no
+  status checks): the median non-benchmark busy level dropped from 17.7% to
+  10.4%, and flags fell from 283 to 103.
+- **Which flags mattered (flagged vs unflagged reps of the same config):**
+  - single-thread latency rows were still biased (ws median +2.7%, tlb
+    +7.8%);
+  - rows using several CPUs showed no effect (bw 4 threads 0.997; knee
+    0.995-1.003). With 7 of 8 CPUs busy, Windows' own work must land on the
+    remaining CPU. Flags there are expected and harmless;
+  - unpinned `pin` rows are flagged by design (the thread migrates).
+- **Re-measured:** the 26 latency-sensitive flagged rows (13 ws, 6 tlb, 4
+  pinned pin, 3 single-thread bw) with `scripts/remeasure_flagged.py`.
+  - Exact command rebuilt from each row (dry-run checked against the sweep
+    definitions); own typeperf log per round; same flag rule
+    (`check_interference.worst_other`, shared).
+  - 25 clean in round 1, 1 in round 2.
+  - Originals kept in `data/raw/remeasured_originals.csv`.
+  - Independent re-check: 103 - 26 = **77 flagged remain, all multi-CPU or
+    unpinned**.
+- Gate-review fixes in the re-measure tooling: retry-on-flag was not
+  actually implemented in the first draft (only retry-on-failure), and the
+  flagger only read the sweep's CPU log. Both fixed (rounds; merged logs) and
+  verified: refactored flagger output byte-identical on runs 1 and 2.
+- **Value review** (vs hypotheses and known values):
+  - **latency:** L1 5.1 cyc, L2 14.1, 1 MB 19.6 (STLB), L3 4 MB 52 cyc,
+    DRAM 105 (64 MB) to 116 ns (512 MB); spread across 3 processes mostly
+    <2%. Sequential chase at DRAM 4.4 ns (26x pitfall);
+  - **TLB:** +1.9 ns step right after 64 pages (~7 cyc STLB hit, as H6
+    predicted) and +9.4-10 ns after 2048 pages (~37 cyc walk, within H6's
+    20-40); grows to +30 ns at 65536 pages;
+  - **MLP:** linear to K=12 (5.68 GB/s), flat at 14-16 with per-chain
+    latency 150-172 ns (fill-buffer limit, H3);
+  - **knee:** flat ~114-125 ns until ~17-20 GB/s, then 282-451 ns at
+    22-23 GB/s. **R/W mix** at 3 threads: w0 22.6 GB/s / 282 ns, w30 19.2 /
+    392, w50 18.4 / 436, w100 18.7 / 497 (DRAM GB/s);
+  - **bw:** seq read 19.5 (1 thread) / 23.1 GB/s (4 threads). 100% regular
+    writes 9.0 useful = 18.0 DRAM; NT writes 22.1. Granularity 8 vs 64 B:
+    277 vs 305 M lines/s (line-limited);
+  - **bwws:** L3 reads 51-52 GB/s, matching Project 1's peak.c (51 GB/s)
+    independently. L1/L2 points (95-102) are loop-bound, as documented.
+  - **pin** (honest negative): on the quiet machine, unpinned was NOT
+    noisier (CV 0.7% vs pinned 4.6%, which includes one 131.8 ns
+    outlier). H7's "unpinned -> noisier" is not supported here. Run 1's
+    interference is the stronger pitfall evidence.
+
 ### Correctness suite (`scripts/test.sh`, now 366 checks, all pass)
 - lat single-cycle check: random/seq/page modes, 128 B .. 256 MB.
 - **Mutation:** `lat_mutant` (Fisher-Yates instead of Sattolo, which can

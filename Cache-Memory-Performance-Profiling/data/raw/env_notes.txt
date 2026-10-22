@@ -11,3 +11,4 @@ Manual notes (not detectable by script):
 - Intel MLC not used: the rubric allows "an equivalent memory benchmark";
   latency/bandwidth tools are written in src/.
 - Batch 2 full sweeps started 2026-10-22 00:58 EDT: plugged in; student may do light document editing in Edge (interference is flagged via data/raw/cpu_log.csv).
+- Batch 2 run 2 (quiet re-run) started 2026-10-22 01:42 EDT: Edge closed, student away, no status checks during the run.

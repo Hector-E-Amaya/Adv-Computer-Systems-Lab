@@ -60,12 +60,34 @@ def bench_cpus(row):
     return {int(row["cpu"])}
 
 
+def worst_other(row, samples):
+    """Busiest non-benchmark CPU (mean % busy) over the row's time window.
+    Shared by remeasure_flagged.py so both apply exactly the same rule."""
+    t0, t1 = float(row["t_start"]), float(row["t_end"])
+    win = [s for t, s in samples if t0 < t <= t1 + 1.0]
+    nwin = len(win)  # 0 = no sample inside the window: nearest sample used
+    if not win:
+        win = [min(samples, key=lambda ts: abs(ts[0] - t1))[1]]
+    mean = {c: sum(s[c] for s in win) / len(win) for c in win[0]}
+    used = bench_cpus(row)
+    if -1 in used:  # unpinned: busiest CPU is the benchmark
+        used = {max(mean, key=mean.get)}
+    others = {c: v for c, v in mean.items() if c not in used}
+    cpu = max(others, key=others.get)
+    return others[cpu], cpu, nwin, used
+
+
 def main():
     global RAW, PROC
     suffix = sys.argv[sys.argv.index("--suffix") + 1] if "--suffix" in sys.argv else ""
     if "--dir" in sys.argv:  # e.g. --dir data/raw/run1_interfered: read and write there
         RAW = PROC = (ROOT / sys.argv[sys.argv.index("--dir") + 1]).resolve()
-    samples = load_cpu_log(RAW / f"cpu_log{suffix}.csv")
+    # The sweep's log plus any re-measurement logs: every row is judged by the
+    # samples from its own time window.
+    logs = [RAW / f"cpu_log{suffix}.csv"]
+    if not suffix:
+        logs += sorted(RAW.glob("cpu_log_remeasure_r*.csv"))
+    samples = sorted(s for p in logs if p.exists() for s in load_cpu_log(p))
     if not samples:
         print("FAIL: no CPU samples")
         return 1
@@ -80,21 +102,11 @@ def main():
             for i, row in enumerate(csv.DictReader(f), 1):
                 total += 1
                 t0, t1 = float(row["t_start"]), float(row["t_end"])
-                win = [s for t, s in samples if t0 < t <= t1 + 1.0]
-                if not win:
-                    nowin += 1
-                    win = [min(samples, key=lambda ts: abs(ts[0] - t1))[1]]
-                cpus = sorted(win[0])
-                mean = {c: sum(s[c] for s in win) / len(win) for c in cpus}
-                used = bench_cpus(row)
-                if -1 in used:  # unpinned: busiest CPU is the benchmark
-                    used = {max(mean, key=mean.get)}
-                others = {c: v for c, v in mean.items() if c not in used}
-                worst_cpu = max(others, key=others.get)
-                worst = others[worst_cpu]
+                worst, worst_cpu, nwin, used = worst_other(row, samples)
+                nowin += nwin == 0
                 flag = worst > THRESHOLD
                 flagged += flag
-                out.append([name, i, row["rep"], f"{t0:.3f}", f"{t1 - t0:.2f}", len(win),
+                out.append([name, i, row["rep"], f"{t0:.3f}", f"{t1 - t0:.2f}", nwin,
                             " ".join(map(str, sorted(used))), worst_cpu, f"{worst:.1f}", int(flag)])
     PROC.mkdir(parents=True, exist_ok=True)
     dst = PROC / f"interference{suffix}.csv"
