@@ -15,7 +15,7 @@ scripts/capture_env.sh > data/raw/env.txt   # hardware / OS / memory / VBS / too
 scripts/build.sh                            # build/{lat,bw,loaded,kern}.exe + asm
 scripts/test.sh                             # 366 correctness, regression + sanity checks
 scripts/run_sweeps.sh all                   # ~35-45 min, all sweeps + CPU logger (QUICK=1: 90 s smoke run)
-scripts/run_counters.sh                     # ADMIN Git Bash only: VTune counter runs (~25 min)
+scripts/run_counters.sh                     # ADMIN Git Bash only: 45 VTune runs (~35 min)
 ```
 
 ## Platform

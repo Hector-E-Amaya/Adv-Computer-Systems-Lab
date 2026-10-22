@@ -258,6 +258,27 @@ means the report has numbers.
     outlier). H7's "unpinned -> noisier" is not supported here. Run 1's
     interference is the stronger pitfall evidence.
 
+### Counter run extended before running (student review of run 2)
+- 36 -> 45 runs:
+  - `lat_seq_256M` (pitfall is DRAM-resident);
+  - `bw_seq_4M` / `bw_seq_256M` (51 GB/s served by L3; DRAM reference);
+  - page/control pairs at 96 and 3072 pages (just past the steps);
+  - two VTune memory-access runs: 100% regular writes (validates the RFO
+    model; the smoke test covered reads only) and the knee top point
+    (validates est_dram on the knee axis).
+- Knee caveat for Little's Law: at the top point N = 23.3 GB/s x 451 ns /
+  64 B = ~164 lines in flight. That is plausible only with hardware
+  prefetches counted (streaming threads keep many L2 prefetches
+  outstanding). R is the chase probe's latency, not the mean over all
+  requests: an approximation, to be stated in the report.
+- Memory-access summaries average the whole process, so the steady phase
+  was made long (~4-5 s), and the observed maximum is also used.
+- Gate tests (stand-in VTune): 45/45 PASS when names or func@ addresses are
+  present; FAIL correctly on a wrong function, a missing DRAM line or a failed
+  collection. One stand-in limitation (it didn't know bw's function) was
+  fixed in the stand-in, not the script. Stand-in output verified fake and
+  removed.
+
 ### Correctness suite (`scripts/test.sh`, now 366 checks, all pass)
 - lat single-cycle check: random/seq/page modes, 128 B .. 256 MB.
 - **Mutation:** `lat_mutant` (Fisher-Yates instead of Sattolo, which can

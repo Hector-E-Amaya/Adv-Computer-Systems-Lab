@@ -4,7 +4,7 @@
 #   Start menu -> Git Bash (right-click) -> Run as administrator, then
 #   cd "/c/Users/hamay/Documents/AdvCompSys Project/Adv-Computer-Systems-Lab/Cache-Memory-Performance-Profiling"
 #   scripts/run_counters.sh
-# Takes about 25 minutes (each run: a few seconds of collection plus VTune's
+# Takes about 35 minutes (each run: a few seconds of collection plus VTune's
 # "Finalizing results"). Do not press keys while it runs.
 #
 # Runs (same 9-event set validated by vtune_smoke.sh):
@@ -13,6 +13,10 @@
 #   lat_random_<size>      random chase per level -> hit fractions for AMAT
 #   lat_page_<pages> / lat_ctrl_<pages>  page mode + compact control
 #                          -> DTLB page walks per load
+#   lat_seq_256M, bw_seq_4M, bw_seq_256M  evidence: pitfall DRAM-resident,
+#                          51 GB/s at 4 MB served by L3
+#   mem_bw_write100, mem_loaded_t3_d0  VTune memory-access: measured DRAM
+#                          GB/s vs our write-traffic and knee estimates
 #
 # Output: data/raw/counters/<run>.csv (hw-events per function) and
 # <run>.app (the program's own CSV row, for normalisation), plus
@@ -60,7 +64,7 @@ log() { echo "$*" | tee -a "$LOG"; }
 : > "$LOG"
 echo "run,tool,function_regex,function_addr,args,app_row" > "$MAN"
 log "# run_counters $(date -u +%Y-%m-%dT%H:%M:%SZ), commit $COMMIT, vtune results in $RUN"
-log "# running: about 25 minutes; VTune pauses on 'Finalizing results'. Do not press keys."
+log "# running: about 35 minutes; VTune pauses on 'Finalizing results'. Do not press keys."
 trap 'log "INTERRUPTED: stopped before finishing; data/raw/counters is incomplete. Run it again."; exit 130' INT TERM HUP
 
 # VTune may show functions as func@0x<address> (it did not use the binaries'
@@ -121,11 +125,58 @@ done
 for s in 16K 64K 256K 1M 2M 4M 8M 16M 64M 256M; do
     one lat_random_$s '^chase1$' lat --size $s --min-time 0.3 --trials 5
 done
-# 3. page mode vs compact control (TLB walks)
-for p in 64 1024 2048 8192 32768; do
+# 3. page mode vs compact control (TLB walks). 96 and 3072 sit just past the
+#    measured latency steps (64 and 2048 pages): walks per load must jump
+#    there while the cache hit/miss mix stays equal to the control.
+for p in 64 96 1024 2048 3072 8192 32768; do
     one lat_page_$p '^chase1$' lat --size $((p * 4096)) --mode page --min-time 0.3 --trials 5
     one lat_ctrl_$p '^chase1$' lat --size $((p * 64)) --mode random --min-time 0.3 --trials 5
 done
+# 4. evidence runs for claims that agreement alone cannot prove
+#    - sequential-chase pitfall really is DRAM-resident (L3 misses, L2 line
+#      fills ~1 per load at 256 MB)
+#    - bw's 51 GB/s at 4 MB really is served by L3 (L3 hits, ~0 L3 misses);
+#      256 MB as the DRAM reference
+one lat_seq_256M '^chase1$' lat --size 256M --mode seq --min-time 0.3 --trials 5
+one bw_seq_4M '^run_seq_8$' bw --size 4M --dur 1 --trials 3
+one bw_seq_256M '^run_seq_8$' bw --size 256M --dur 1 --trials 3
+
+# one_mem NAME TOOL ARGS...: VTune memory-access analysis -> measured DRAM
+# bandwidth, to validate the DRAM-traffic models used on bandwidth axes.
+one_mem() {
+    local name=$1 tool=$2
+    shift 2
+    local r=$RUN/$name out=$RUN/$name.out sum=$DST/$name.summary.txt
+    total=$((total + 1))
+    if ! "$V" -collect memory-access -r "$r" -- "build/$tool.exe" "$@" > "$out" 2>&1; then
+        log "FAIL [$name]: memory-access collection failed (see $out)"
+        failed=$((failed + 1))
+        return
+    fi
+    grep -E "^$tool," "$out" | tr -d '\r' > "$DST/$name.app"
+    if ! "$V" -report summary -r "$r" > "$RUN/$name.summary.raw" 2>> "$out"; then
+        log "FAIL [$name]: summary report failed (see $out)"
+        failed=$((failed + 1))
+        return
+    fi
+    tr -d '\r' < "$RUN/$name.summary.raw" > "$sum"
+    if ! grep -qE "^DRAM, GB/sec" "$sum" || [ ! -s "$DST/$name.app" ]; then
+        log "FAIL [$name]: no DRAM bandwidth line or no app row"
+        failed=$((failed + 1))
+        return
+    fi
+    echo "$name,$tool,memory-access,,\"$*\",\"$(cat "$DST/$name.app")\"" >> "$MAN"
+    log "PASS [$name] $(grep -E '^DRAM, GB/sec' "$sum" | tr -s ' ')"
+}
+# 5. measured DRAM bandwidth for the two models that matter most
+#    - 100% regular writes: bw estimates 2 lines per written line (RFO +
+#      write-back); smoke test validated reads only
+#    - loaded knee top point: est_dram on the knee's bandwidth axis
+#    VTune's summary averages the whole process, setup included, so each run's
+#    steady phase is made long (~4-5 s) to dominate; the analysis also uses the
+#    summary's observed maximum (steady-state plateau).
+one_mem mem_bw_write100 bw --size 256M --wpct 100 --dur 1 --trials 4
+one_mem mem_loaded_t3_d0 loaded --threads 3 --delay 0 --window 0.25 --trials 20
 
 if [ "$failed" -eq 0 ]; then
     log "ALL $total RUNS PASSED -> $DST"

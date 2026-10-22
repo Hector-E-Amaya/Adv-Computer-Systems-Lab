@@ -32,6 +32,16 @@ attributed accurately. Commit hashes point to the evidence.
 | 13 | Accidental interruption of the admin run | Revealed a gap | Script now logs INTERRUPTED and exits 130 instead of ending with no verdict; tested (6a9e324) |
 | 14 | Can other work (Edge, slides/docs) run during sweeps? | Valid: it adds memory/CPU interference | Implemented: typeperf per-CPU logger, per-row timestamps, flag-and-rerun rule (Batch 2). **Run 1 confirmed the concern:** 30% of rows flagged, with median latency +13% and bandwidth -12% on flagged reps. Archived as pitfall evidence; quiet re-run |
 
+### Review of the run-2 results (2026-10-22, before the counter run)
+| # | Concern (student) | Verdict after checking | Outcome |
+|---|---|---|---|
+| 15 | Sequential-chase pitfall holds only if the working set is truly DRAM-resident | Valid caveat (resident by construction, but unproven) | Counter evidence run added: `lat_seq_256M` (L3 misses / L2 line fills per load) |
+| 16 | TLB steps: cache conflicts could contribute | Valid: only counters can separate TLB from cache | Page + control counter pairs extended with 96 and 3072 pages (just past each step): walks must jump while the hit mix matches the control |
+| 17 | The K-chain plateau does not prove exactly 12 fill buffers | **Valid: the assistant overclaimed.** Every load in a random 256 MB chase also page-walks, so walkers could be the limit | Wording corrected to "effective concurrency limit ~12" with both candidate causes |
+| 18 | Knee: check definitions before applying Little's Law | Valid, important: the top point implies ~164 lines in flight (needs prefetches), and R is the probe's latency, not all requests' | VTune memory-access run on the knee's top point to validate the bandwidth axis; the report states the approximation |
+| 19 | L3 51 GB/s agreeing with Project 1 doesn't prove L3 served it | Valid: consistency is not proof | Counter evidence run added: `bw_seq_4M` (L3 hits vs misses) |
+| 20 | Pinning negative result is legitimate | Agreed | Reported as a negative result |
+
 ## Found by the assistant's own testing (for accurate attribution)
 - `bw` first version was CPU-bound (10 GB/s vs 20.8 GB/s expected); rewritten twice (352e811).
 - DRAM-latency run-to-run noise: medians drift 10-25%, minima stable (352e811).
