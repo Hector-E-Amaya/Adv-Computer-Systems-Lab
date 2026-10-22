@@ -119,10 +119,15 @@
   reads; read p99 293 us -> 1.9 ms -> 4.1 ms as writes are added.
 - Tail: randread p99.9/p50 = 9x (QD16), 16x (QD32 knee); randwrite QD16
   p99.9 30.5 ms vs p50 112 us (272x).
-- State: the 16 GiB seq write peaked at 183 MB/s in second 1, median 133,
-  min 42 MB/s over 133 s. **No SLC burst observable**: the ~130 MB/s cap
-  holds from the first second (H7 burst-then-drop not seen). Steady 4K
-  randwrite 126 MB/s.
+- State: the 16 GiB seq write peaked at 192 MB/s in second 1, median 140,
+  min 45 MB/s over 133 s (decimal MB/s; an earlier note gave 183/133/42,
+  which were MiB/s: same data). **No SLC burst observable**: the cap holds
+  from the first second (H7 burst-then-drop not seen).
+  - The 1 s plot shows a regime change: ~140-180 MB/s for the first ~75 s
+    (~10 GB), then repeated stalls down to 45-60 MB/s. That is consistent
+    with an internal buffer filling or heat building; not separable without
+    in-run temperature.
+  - Steady 4K randwrite 126 MB/s.
 - **Pitfall run 1 (kept as data/raw/pitfall_run1):**
   - rep 2 overlapped the student's status message and the assistant's
     check (09:17): all runs degraded;
@@ -132,6 +137,15 @@
   direct 8.0K / 7.3K / 5.3K. The warm pass was cached every time (~5 GB/s).
   Buffered results swing 3x with OS cache state; direct stays steady. Median
   gap ~23x.
+- **Batch 3 review (student concerns 28-32):**
+  - write runs not CPU-bound either (CPU median 10%, p90 24%);
+  - mix QD16 (84K) matches QD-sweep QD16 (82.5-83.0K);
+  - write tail p99.9/p50 = 195/272/272x across reps;
+  - wording: "write buffer", not "SLC"; "burst not observable through the
+    cap", not "no SLC cache".
+- **Batch 3 analysis cross-check:** Windows disk bytes/s / fio MB/s median
+  1.005 (172 runs); Windows avg disk queue / fio effective QD median 0.96:
+  two independent measures agree.
 - run_sweeps.py printed nothing to the log until exit (Python output
   buffering when redirected): use `python -u` for live logs.
 

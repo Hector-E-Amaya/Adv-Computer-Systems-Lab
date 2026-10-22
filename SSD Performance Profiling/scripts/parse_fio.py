@@ -15,7 +15,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 RAW, PROC = ROOT / "data" / "raw", ROOT / "data" / "processed"
 PCTS = [("p50", "50.000000"), ("p95", "95.000000"), ("p99", "99.000000"), ("p999", "99.900000")]
-PARAMS = ["rw", "bs", "iodepth", "numjobs", "rwmixread", "ioengine", "direct", "size", "runtime", "filename"]
+PARAMS = ["rw", "bs", "iodepth", "numjobs", "rwmixread", "ioengine", "direct", "size", "runtime", "ramp_time",
+          "filename"]
 
 
 def depth_mean(levels):
