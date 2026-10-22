@@ -98,6 +98,16 @@ Tooling/line-ending issues (no measurement impact):
   instead of 6, one of which was a `to_string` call it would have broken:
   edits now use exact, unique patterns. Exit codes are checked explicitly.
 
+### VTune smoke test, first attempt (2026-10-21 20:20, interrupted)
+- Run as administrator: "Collection started ... Collection stopped" for the
+  saxpy event set, with no driver/permission error. So **hardware event
+  sampling works with VBS/memory integrity on**, when elevated.
+- The run was stopped by accident during VTune's "Finalizing results" step
+  and left a log with no verdict. Gap fixed: the script now traps
+  Ctrl+C/close and logs "INTERRUPTED ... run it again" (exit 130), and warns
+  up front that finalizing takes minutes. Tested with a hanging stand-in
+  interrupted like Ctrl+C. The stand-in's output was removed afterwards.
+
 ### Correctness suite (`scripts/test.sh`, now 361 checks, all pass)
 - lat single-cycle check: random/seq/page modes, 128 B .. 256 MB.
 - **Mutation:** `lat_mutant` (Fisher-Yates instead of Sattolo, which can

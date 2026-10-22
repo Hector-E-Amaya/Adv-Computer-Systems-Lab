@@ -52,6 +52,9 @@ log() { echo "$*" | tee -a "$OUT"; }
 # fall back quietly instead of printing an alarming error.
 COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)
 log "# vtune smoke $(date -u +%Y-%m-%dT%H:%M:%SZ), commit $COMMIT, results in $RUN"
+log "# running: takes 2-4 minutes; VTune pauses while 'Finalizing results'. Do not press keys."
+# A stopped run (Ctrl+C, closed window) must say so, not end without a verdict.
+trap 'log "INTERRUPTED: run stopped before finishing; results are incomplete. Run it again."; exit 130' INT TERM HUP
 "$V" --version >> "$OUT" 2>&1 || { log "FAIL: vtune --version"; failed=1; }
 
 # check_events NAME CMD...: collect the event set, export a CSV report, and
