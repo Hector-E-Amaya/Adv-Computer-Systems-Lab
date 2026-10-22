@@ -8,7 +8,7 @@ DDR4-3200, a Samsung PM991a 512 GB NVMe SSD, and Windows 11 Home.
 |---|---|---|
 | #1 [SIMD Advantage Profiling](SIMD-Advantage-Profiling/) (110 pts) | [REPORT](SIMD-Advantage-Profiling/reports/REPORT.md) | SIMD speedup tracks lane count in L1 (saxpy f32 3.0x / 6.0x / 10.75x for SSE2 / AVX2 / AVX-512) and vanishes in DRAM (1.05x), where scalar code already saturates single-core bandwidth |
 | #2 [Cache & Memory Performance Profiling](Cache-Memory-Performance-Profiling/) (185 pts) | [REPORT](Cache-Memory-Performance-Profiling/reports/REPORT.md) | L1 / L2 / L3 latency 5.0 / 14.1 / ~40 cycles, DRAM 82.5 ns; loaded-latency knee at ~72-84% of the 25.6 GB/s peak; TLB steps confirmed by VTune counters |
-| #3 [SSD Performance Profiling](SSD-Performance-Profiling/) (185 pts) | [REPORT](SSD-Performance-Profiling/reports/REPORT.md) | QD=1 4 KiB random read 139 us; knee at QD 32 (126 K IOPS); Little's Law within 1-5%; device/link-side ceilings of ~0.75 GB/s read (varies by session) and ~0.15 GB/s write |
+| #3 [SSD Performance Profiling](SSD-Performance-Profiling/) (185 pts) | [REPORT](SSD-Performance-Profiling/reports/REPORT.md) | QD=1 4 KiB random read 139 us; knee at QD 32 (126 K IOPS); Little's Law within 1-5%; device/link-side ceilings of ~0.75 GB/s read (falls ~25-30% under sustained load) and ~0.15 GB/s write |
 
 All three projects are complete.
 

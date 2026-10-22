@@ -81,12 +81,14 @@ def d(rw):
 # ---------------------------------------------------------------- 1. QD=1 baselines
 print("1. QD1")
 q1 = load("qd1")
-body = []
+body, q1err = [], []
 for name, lab in (("randread_4k_qd1", "4 KiB random read"), ("randwrite_4k_qd1", "4 KiB random write"),
                   ("read_128k_qd1", "128 KiB seq read"), ("write_128k_qd1", "128 KiB seq write")):
     rs = [r for r in q1 if r["name"] == name]
     dd = d(name)
     med = lambda k: st.median(f(r, k) for r in rs)
+    q1err.append([(min(f(r, f"{dd}_{p}_us") for r in rs), max(f(r, f"{dd}_{p}_us") for r in rs))
+                  for p in ("p50", "p95", "p99", "p999")])
     body.append([lab, med("iops"), med("mbps"), med("lat_mean_us"), med(f"{dd}_slat_mean_us"),
                  med(f"{dd}_p50_us"), med(f"{dd}_p95_us"), med(f"{dd}_p99_us"), med(f"{dd}_p999_us"),
                  f"{min(f(r, 'lat_mean_us') for r in rs):.0f}-{max(f(r, 'lat_mean_us') for r in rs):.0f}"])
@@ -101,11 +103,13 @@ fig, ax = plt.subplots(figsize=(8, 3.8))
 pl = ["p50", "p95", "p99", "p99.9"]
 w = 0.2
 for i, row in enumerate(body):
-    ax.bar([x + (i - 1.5) * w for x in range(4)], row[5:9], width=w, color=C[i], label=row[0])
+    yerr = [[m - lo for m, (lo, _) in zip(row[5:9], q1err[i])], [hi - m for m, (_, hi) in zip(row[5:9], q1err[i])]]
+    ax.bar([x + (i - 1.5) * w for x in range(4)], row[5:9], width=w, color=C[i], label=row[0], yerr=yerr,
+           error_kw=dict(ecolor=INK, elinewidth=0.8, capsize=2))
 ax.set_xticks(range(4), pl)
 ax.set_yscale("log")
 ax.set_ylabel("latency (us, log)")
-ax.set_title("QD=1 latency percentiles (median of 3 runs)", loc="left", fontsize=9)
+ax.set_title("QD=1 latency percentiles (bar = median of 3 runs, whisker = min..max)", loc="left", fontsize=9)
 ax.legend(fontsize=7)
 save(fig, "qd1_percentiles.png")
 
@@ -165,13 +169,14 @@ a1.plot(x, [mi[m][0] / 1e3 for m in mixes], color=C[0], marker=M[0])
 a1.fill_between(x, [mi[m][1] / 1e3 for m in mixes], [mi[m][2] / 1e3 for m in mixes], color=C[0], alpha=0.15, lw=0)
 a1.set_ylabel("total IOPS (K)")
 a1.set_title("Throughput vs read share", loc="left", fontsize=9)
-a2.plot([m for m in x if str(m) in rp], [rp[str(m)][0] / 1e3 for m in x if str(m) in rp], color=C[0], marker=M[0],
-        label="read p99")
-a2.plot([m for m in x if str(m) in wp], [wp[str(m)][0] / 1e3 for m in x if str(m) in wp], color=C[1], marker=M[1],
-        label="write p99")
+for j, (t, lab) in enumerate(((rp, "read p99"), (wp, "write p99"))):
+    xm = [m for m in x if str(m) in t]
+    v = [t[str(m)] for m in xm]
+    a2.errorbar(xm, [y[0] / 1e3 for y in v], yerr=[[(y[0] - y[1]) / 1e3 for y in v], [(y[2] - y[0]) / 1e3 for y in v]],
+                color=C[j], marker=M[j], capsize=3, elinewidth=0.8, label=lab)
 a2.set_yscale("log")
 a2.set_ylabel("p99 latency (ms, log)")
-a2.set_title("Tail latency vs read share", loc="left", fontsize=9)
+a2.set_title("Tail latency vs read share (whisker = min..max of 3)", loc="left", fontsize=9)
 a2.legend()
 for ax in (a1, a2):
     ax.set_xlabel("reads (%)")
@@ -195,8 +200,10 @@ for j, rw in enumerate(("randread", "randwrite")):
     for q in qs:
         qbody.append([rw, str(q), qe[q][0], qi[q][0], f"{qi[q][1] / 1e3:.0f}-{qi[q][2] / 1e3:.0f}K", ql[q][0],
                       qp[q][0], qi[q][0] * ql[q][0] / 1e6])
-    a1.plot([qi[q][0] / 1e3 for q in qs], [ql[q][0] for q in qs], color=C[j], marker=M[j],
-            label=f"4 KiB {rw.replace('rand', 'random ')}")
+    a1.errorbar([qi[q][0] / 1e3 for q in qs], [ql[q][0] for q in qs],
+                xerr=[[(qi[q][0] - qi[q][1]) / 1e3 for q in qs], [(qi[q][2] - qi[q][0]) / 1e3 for q in qs]],
+                yerr=[[ql[q][0] - ql[q][1] for q in qs], [ql[q][2] - ql[q][0] for q in qs]],
+                color=C[j], marker=M[j], elinewidth=0.7, capsize=2, label=f"4 KiB {rw.replace('rand', 'random ')}")
     for q in qs:
         a1.annotate(str(q), (qi[q][0] / 1e3, ql[q][0]), fontsize=6, color=INK2, xytext=(3, 2),
                     textcoords="offset points")
@@ -206,7 +213,8 @@ for j, rw in enumerate(("randread", "randwrite")):
 a1.set_yscale("log")
 a1.set_xlabel("throughput (K IOPS)")
 a1.set_ylabel("mean latency (us, log)")
-a1.set_title("Throughput vs latency (labels = QD, circle = knee)", loc="left", fontsize=9)
+a1.set_title("Throughput vs latency\n(labels = QD, circle = knee, whiskers = min..max of 3)", loc="left",
+             fontsize=9)
 a1.legend(fontsize=7)
 a2.plot([1, 256], [1, 256], color=INK2, ls="--", lw=1, label="effective = requested")
 a2.set_xscale("log", base=2)
@@ -236,12 +244,16 @@ for j, name in enumerate(sorted({r["name"] for r in tl})):
     rs = [r for r in tl if r["name"] == name]
     dd = d(name)
     vals = [st.median(f(r, f"{dd}_{p}_us") for r in rs) for p, _ in pk]
+    lo = [min(f(r, f"{dd}_{p}_us") for r in rs) for p, _ in pk]
+    hi = [max(f(r, f"{dd}_{p}_us") for r in rs) for p, _ in pk]
     tbody.append([name, st.median(f(r, "iops") for r in rs)] + vals + [vals[3] / vals[0]])
-    ax.plot([str(x) for _, x in pk], vals, color=C[j], marker=M[j], label=name.replace("_", " "))
+    ax.errorbar([str(x) for _, x in pk], vals, yerr=[[v - a for v, a in zip(vals, lo)], [b - v for v, b in zip(vals, hi)]],
+                color=C[j], marker=M[j], capsize=3, elinewidth=0.8, label=name.replace("_", " "))
 ax.set_yscale("log")
 ax.set_xlabel("percentile")
 ax.set_ylabel("latency (us, log)")
-ax.set_title("Tail latency at mid QD (16) and at the knee (30 s runs, median of 3)", loc="left", fontsize=9)
+ax.set_title("Tail latency at mid QD (16) and at the knee (30 s runs; median of 3, whisker = min..max)", loc="left",
+             fontsize=9)
 ax.legend(fontsize=7)
 save(fig, "tail_latency.png")
 wcsv("summary_tail.csv", ["run", "iops", "p50_us", "p95_us", "p99_us", "p999_us", "p999_over_p50"], tbody)

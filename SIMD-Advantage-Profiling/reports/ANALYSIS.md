@@ -203,7 +203,7 @@ Where the kernels sit (fp32):
     by FMA.
 - **Scalar points** sit near the scalar *compute* ceiling, not on a
   bandwidth roof: scalar stencil 7.3 GFLOP/s = 100% of the 7.3 scalar peak,
-  scalar saxpy 73%. In cache, the scalar build is compute-bound. That is
+  scalar saxpy 72%. In cache, the scalar build is compute-bound. That is
   exactly the headroom SIMD exploits.
 - **Plain dot** sits far below every roof (1.9 GFLOP/s), on a ceiling the
   roofline does not draw: FP-add latency (Section 7).

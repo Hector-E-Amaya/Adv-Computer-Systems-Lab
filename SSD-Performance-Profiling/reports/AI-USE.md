@@ -69,7 +69,11 @@ Full chronological record: [NOTES.md](NOTES.md). Attribution:
 **AI errors that were caught and retracted or corrected:**
 - the BitLocker bottleneck claim (above);
 - a wear estimate of "60-80 GB" (correct upper estimate ~163 GB; actual
-  113.8 GB);
+  113.8 GB in the sweeps, ~128 GB including validation, smoke tests and
+  re-runs; "113.8 GB total" was itself corrected in the final audit);
+- a latent gap in the safety check (fio's `directory` / `opendir` /
+  `filename_format` options were not refused; never used, fixed in the
+  final audit with regression cases);
 - shell-escaping mistakes in test commands (caught by fio errors, redone
   through Python).
 

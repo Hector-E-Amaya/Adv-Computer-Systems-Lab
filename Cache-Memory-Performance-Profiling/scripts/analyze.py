@@ -212,12 +212,13 @@ a1.plot(ks, [k * mg[1][0] for k in ks], color=INK2, ls="--", lw=1, label="ideal:
 a1.set_ylabel("throughput (GB/s)")
 a1.legend()
 a2.plot(ks, [ml[k][0] for k in ks], color=C[1], marker=M[1])
+a2.fill_between(ks, [ml[k][1] for k in ks], [ml[k][2] for k in ks], color=C[1], alpha=0.15, lw=0)
 a2.set_ylabel("per-chain latency (ns)")
 for ax in (a1, a2):
     ax.set_xlabel("independent chains K")
     ax.axvline(12, color=INK2, lw=0.8, ls=":")
-a1.set_title("Throughput vs concurrency (plateau ~12)", loc="left", fontsize=9)
-a2.set_title("Latency rises once concurrency saturates", loc="left", fontsize=9)
+a1.set_title("Throughput vs concurrency (plateau ~12; band = min..max of 3)", loc="left", fontsize=9)
+a2.set_title("Latency rises once concurrency saturates (band = min..max)", loc="left", fontsize=9)
 save(fig, "mlp.png")
 
 # ------------------------------------------------------------ 4. loaded latency / knee
@@ -232,10 +233,12 @@ kbody = []
 for j, th in enumerate((1, 2, 3, 5, 6)):
     # in order of increasing intensity (decreasing injection delay), not sorted
     # by bandwidth: near saturation bandwidth is flat while latency still rises
-    pts = [(kb[k][0], kl[k][0]) for k in sorted((k for k in kb if k[0] == th and k[2] == 0),
-                                                  key=lambda k: -k[1])]
-    pts = [(kb[(0, 0, 0)][0], idle)] + pts
-    ax.plot([p[0] for p in pts], [p[1] for p in pts], color=C[j], marker=M[j], label=f"{th} traffic threads")
+    keys = [(0, 0, 0)] + sorted((k for k in kb if k[0] == th and k[2] == 0), key=lambda k: -k[1])
+    pts = [(kb[k][0], kl[k][0]) for k in keys]
+    ax.errorbar([p[0] for p in pts], [p[1] for p in pts],
+                xerr=[[kb[k][0] - kb[k][1] for k in keys], [kb[k][2] - kb[k][0] for k in keys]],
+                yerr=[[kl[k][0] - kl[k][1] for k in keys], [kl[k][2] - kl[k][0] for k in keys]],
+                color=C[j], marker=M[j], elinewidth=0.6, capsize=1.5, label=f"{th} traffic threads")
     knee = None
     for (b0, l0), (b1, l1) in zip(pts, pts[1:]):
         if l0 <= 1.5 * idle < l1:
@@ -254,8 +257,8 @@ ax.text(25.6, 1.0, " 25.6 GB/s single-channel peak", transform=ax.get_xaxis_tran
         color=INK2, va="top", ha="right")
 ax.set_xlabel("total DRAM bandwidth (GB/s, est. incl. write-allocate)")
 ax.set_ylabel("loaded latency of the probe chase (ns)")
-ax.set_title(f"Throughput vs latency (idle {idle:.0f} ns); injection delay decreases left to right",
-             loc="left", fontsize=9)
+ax.set_title(f"Throughput vs latency (idle {idle:.0f} ns); injection delay decreases left to right; "
+             "whiskers = min..max of 3", loc="left", fontsize=9)
 ax.legend(fontsize=7)
 save(fig, "knee.png")
 write_csv("knee.csv", ["traffic_threads", "knee_gbps", "knee_pct_of_max_measured", "knee_pct_of_25_6", "top_gbps",
@@ -302,10 +305,12 @@ for ax, th in zip(axes, ("1", "4")):
         ws_ = ("0", "30", "50", "100")
         ax.plot([0, 30, 50, 100], [bd[(th, p, s, "64", w, "0")][0] for w in ws_], color=C[j], marker=M[j],
                 label=lab + " (DRAM)")
+        ax.fill_between([0, 30, 50, 100], [bd[(th, p, s, "64", w, "0")][1] for w in ws_],
+                        [bd[(th, p, s, "64", w, "0")][2] for w in ws_], color=C[j], alpha=0.15, lw=0)
         ax.plot([0, 30, 50, 100], [bu[(th, p, s, "64", w, "0")][0] for w in ws_], color=C[j], ls="--", lw=1)
     ax.set_xlabel("write share of accesses (%)")
-    ax.set_title(f"{th} thread{'s' if th == '4' else ''}: solid = est. DRAM, dashed = useful", loc="left",
-                 fontsize=9)
+    ax.set_title(f"{th} thread{'s' if th == '4' else ''}: solid = est. DRAM (band = min..max of 3), dashed = useful",
+                 loc="left", fontsize=9)
 axes[0].set_ylabel("GB/s")
 axes[0].legend(fontsize=7)
 save(fig, "bandwidth_patterns.png")
@@ -315,8 +320,9 @@ bwseq = agg([r for r in bws if r["pattern"] == "seq"], lambda r: int(r["size_per
 bwrnd = agg([r for r in bws if r["pattern"] == "random"], lambda r: int(r["size_per_thread"]), "useful_gbps_med")
 fig, ax = plt.subplots(figsize=(8, 3.8))
 xs = sorted(bwseq)
-ax.plot(xs, [bwseq[x][0] for x in xs], color=C[0], marker=M[0], label="sequential read")
-ax.plot(xs, [bwrnd[x][0] for x in xs], color=C[1], marker=M[1], label="random read")
+for j, (t, lab) in enumerate(((bwseq, "sequential read"), (bwrnd, "random read"))):
+    ax.plot(xs, [t[x][0] for x in xs], color=C[j], marker=M[j], label=lab)
+    ax.fill_between(xs, [t[x][1] for x in xs], [t[x][2] for x in xs], color=C[j], alpha=0.15, lw=0)
 ax.axvspan(xs[0], 1280 << 10, color=INK2, alpha=0.06, lw=0)
 ax.text(xs[0] * 1.1, 0.04, "loop-bound region (lower bounds)", transform=ax.get_xaxis_transform(), fontsize=7,
         color=INK2)
@@ -325,8 +331,8 @@ ax.set_yscale("log")
 vlines(ax)
 ax.set_xlabel("buffer size (bytes)")
 ax.set_ylabel("GB/s (log)")
-ax.set_title("Bandwidth vs working set, 1 thread (L3 51 GB/s confirmed L3-served by counters)", loc="left",
-             fontsize=9)
+ax.set_title("Bandwidth vs working set, 1 thread (L3 51 GB/s confirmed L3-served by counters; band = min..max)",
+             loc="left", fontsize=9)
 ax.legend()
 save(fig, "bandwidth_working_set.png")
 

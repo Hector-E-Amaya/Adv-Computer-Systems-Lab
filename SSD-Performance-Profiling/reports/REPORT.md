@@ -20,8 +20,9 @@ fixes. The student's review contributions are in
   (110-116 K). Little's Law holds to within 1-5%, and Windows' own queue
   counter agrees (ratio 0.96).
 - The ceilings are far below the drive's specifications: reads **~0.70-0.75
-  GB/s** (~0.5 GB/s in a same-day re-run, while 4 KiB results reproduced
-  within 3%), writes **~90-150 MB/s**, at any block size. Neither is CPU- or
+  GB/s** in the sweeps (0.79 GB/s from a cold start, falling to ~0.5-0.6
+  GB/s within ~1.5 min of sustained reads), writes **~90-150 MB/s**, at any
+  block size. Neither is CPU- or
   encryption-bound (total CPU median 18% for reads, 10% for writes). The
   limit sits on the device/link side, behind a driver that hides the PCIe
   link state. Its cause is not verified.
@@ -57,10 +58,15 @@ file and refuses, before fio starts:
 - buffered I/O, except the read-only pitfall run;
 - any run that would leave less than 100 GB free.
 
-`python scripts/fio_run.py --selftest-safety` checks that all five bad cases
-are refused. Write volume was kept low on request (system SSD): **113.8 GB
-host writes in total** (fio io_bytes), about 0.04% of the drive's rated
-endurance.
+fio options that pick files another way (`directory`, `opendir`,
+`filename_format`) are refused too. `python scripts/fio_run.py
+--selftest-safety` checks that all ten unsafe cases are refused, including
+`..` traversal and look-alike folders such as `C:\fio-test-evil\`. Write
+volume was kept low on request (system SSD), as summed from fio's io_bytes:
+- **113.8 GB** in the full sweeps;
+- **~128 GB in total**, including validation, smoke tests and the re-runs.
+
+That is about 0.04% of the drive's rated endurance.
 
 **Zero-queue baselines** (QD=1, median of 3; `plots/qd1_percentiles.png`):
 
@@ -136,17 +142,31 @@ Interpretation:
   down-trained link (e.g. x1, or a lower PCIe generation) or a power-saving
   state. The VMD driver does not expose the link, so the cause is reported
   as a hypothesis, not a finding.
-- **The read ceiling is not fixed.** A re-run later the same day ran in the
-  same boot, on AC power, idle ([RECHECK](../../RECHECK_2026-10-22.md);
-  `data/raw/recheck_2026-10-22/`).
-  - Every 4 KiB result reproduced within 0-3%: QD=1 read 138.6 us both
-    times; the knee again at QD 32 (128.8 K IOPS).
-  - Large reads were 26-38% slower in every repetition: 128 KiB at QD=1 ran
-    at 540 vs 730 MB/s, and 1 MiB at QD 16 at 0.45-0.52 GB/s.
-  - A bandwidth ceiling that moves ~30% within one boot, while command
-    throughput stays put, points to a variable state (link power management
-    or thermal) rather than a fixed property of the drive. The cause is
-    still unverified.
+- **The read ceiling is not fixed; it falls under sustained load**
+  ([RECHECK](../../RECHECK_2026-10-22.md); `data/raw/recheck_2026-10-22/`,
+  `data/raw/recheck_ceiling/`).
+  - Re-run later the same day (same boot, AC power, idle, right after 20 min
+    of CPU-heavy sweeps): every 4 KiB result reproduced within 0-3% (QD=1
+    read 138.6 us both times; knee again at QD 32, 128.8 K IOPS). Large
+    reads, though, were 26-38% slower in every repetition: 128 KiB QD=1 540
+    vs 730 MB/s; 1 MiB QD 16 0.45-0.52 GB/s.
+  - Targeted read-only follow-up, starting from an idle machine: five
+    back-to-back repetitions (1 MiB QD 16, 128 KiB QD=1, 4 KiB QD 32, ~30 s
+    per repetition).
+    - The first two ran fast: 1 MiB at 793 / 782 MB/s, 128 KiB QD=1 at 721
+      MB/s, 4 KiB QD 32 at **147.5 K IOPS**.
+    - Within ~1.5 minutes all three fell and stayed down: 563-598 MB/s,
+      461-482 MB/s, and 123-126 K IOPS.
+  - The same pattern explains why the 30 s tail runs give fewer IOPS than
+    the 8 s sweep (section 4a): throughput falls once load is sustained.
+    That fits thermal or power-management throttling better than a fixed
+    link property.
+  - Windows' "PCI Express Link State Power Management" (ASPM) is set to
+    **Maximum power savings** even on AC power (`powercfg`, read-only;
+    `data/raw/recheck_2026-10-22/powercfg_pcie_aspm.txt`). This is a
+    plausible contributor. Testing with ASPM off would change a system
+    power setting, so it was not done. Drive temperature during the runs
+    was not logged (admin rights needed), so the cause remains unverified.
 
 ## 3. Read/write mix and queue-depth analysis (rubric: 40)
 
@@ -169,6 +189,15 @@ Interpretation:
   (70/30) to 4.1 ms (50/50): a 14x tail increase. NAND reads to a die that is
   busy programming must wait (program/read interference), and buffer flushes
   stall reads. This matches H4.
+- **Mixed-workload tails vary strongly between runs**, so the medians above
+  hide a wide spread (whiskers in the plot):
+  - 70/30 write p99 is 138-146 us in two runs but 18.2 ms in the third;
+  - 50/50 read p99 ranges 3.9-24.0 ms.
+
+  The p99.9 is 22-30 ms in every mixed run. Whether p99 lands below or
+  inside that stall regime depends on how often the write buffer drains
+  during the 8 s run. Tail percentiles of mixed workloads therefore need
+  longer runs than throughput does.
 - The mix's pure-read point (84 K) equals the QD sweep at the same QD 16
   (82.5-83.0 K); the 126 K peak is at QD 32 (student concern 30).
 
@@ -289,7 +318,7 @@ matplotlib):
 
 ```bash
 scripts/capture_env.sh > data/raw/env.txt        # OS, CPU, SSD, partitions, power, tools
-python scripts/fio_run.py --selftest-safety       # all 5 unsafe targets must be refused
+python scripts/fio_run.py --selftest-safety       # all 10 unsafe cases must be refused
 python -u scripts/run_sweeps.py all               # ~45 min, machine idle; QUICK=1 for a short smoke run
 python scripts/parse_fio.py                       # data/raw/<sweep>/*.json -> data/processed/<sweep>.csv
 python scripts/analyze.py                         # plots/, summary CSVs, reports/RESULTS_TABLES.md
@@ -377,10 +406,11 @@ write cap: the drop it looks for cannot be seen through the cap.
 - **System drive, file-level testing.** A raw device was not safe to use.
   Every number includes NTFS, BitLocker software encryption and the Intel
   RST/VMD driver, and may not match the PM991a measured raw on another host.
-- **The ceilings are unexplained.** The read ceiling even moved between
-  sessions (0.75 to ~0.52 GB/s in a same-day re-run), so block-size
-  throughput numbers hold for the sweep session only. The 0.75 GB/s read and
-  ~0.15 GB/s write ceilings are not CPU-bound, but the PCIe link state is invisible behind
+- **The ceilings are unexplained, and the read ceiling depends on load
+  history.** It ranges from 0.79 GB/s from a cold start down to ~0.5 GB/s
+  after sustained load, so the block-size throughput numbers describe the
+  sweep's own conditions. The 0.75 GB/s read and ~0.15 GB/s write ceilings
+  are not CPU-bound, but the PCIe link state is invisible behind
   VMD. A down-trained link, an aggressive power state, the driver path, or
   thermal state could each explain them. Verifying this would need firmware
   or BIOS access (e.g. disabling VMD), which is out of scope on a personal
@@ -389,7 +419,8 @@ write cap: the drop it looks for cannot be seen through the cap.
   C). Thermal throttling is neither confirmed nor excluded for the
   device-state stalls or the lower 30 s throughput.
 - **Wear-limited write tests.** 5 s write runs, a 16 GiB burst test and 120 s
-  of random writes keep total writes to 113.8 GB. Full preconditioning to a
+  of random writes keep sweep writes to 113.8 GB (~128 GB including
+  validation, smoke tests and re-runs). Full preconditioning to a
   steady state (writing the whole drive several times) was deliberately not
   done, so "steady state" here means a sustained 120 s load, not a
   fully-aged drive. The short write runs are noisier.

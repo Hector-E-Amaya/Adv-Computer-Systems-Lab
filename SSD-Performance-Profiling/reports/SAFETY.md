@@ -8,7 +8,9 @@ with direct I/O**, which the assignment explicitly allows.
 Rules, enforced by the scripts (Batch 1 adds checks for each):
 1. **Test files live only in `C:\fio-test\`.** That folder is created for this
    project, outside the repository, OneDrive and user documents. A script
-   refuses any `filename` outside it.
+   refuses any `filename` outside it (`..` traversal and look-alike folders
+   included). It also refuses fio options that pick files another way
+   (`directory`, `opendir`, `filename_format`).
 2. **Never `\\.\PhysicalDrive*` or a drive letter** as an fio target (refused).
 3. **Direct I/O always** (`direct=1`), except the one deliberate buffered-I/O
    pitfall run, which is read-only on the test file.

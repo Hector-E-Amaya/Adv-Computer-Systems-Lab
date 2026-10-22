@@ -2,7 +2,9 @@
 JSON output in data/raw/<sweep>/.
 
 Safety (reports/SAFETY.md), checked before EVERY run and refused otherwise:
-  - target file must be inside C:\\fio-test\\ (no raw devices, no drive letters)
+  - target file must be inside C:\\fio-test\\ (no raw devices, no drive letters);
+    fio options that pick files another way (directory, opendir,
+    filename_format) are refused
   - direct=1, unless the run is the declared read-only buffered pitfall
   - creating/extending the file must leave >= 100 GB free on C:
 
@@ -50,6 +52,9 @@ def check_safety(p):
     fn = str(p.get("filename", ""))
     if not fn:
         raise SafetyError("no filename")
+    for k in ("directory", "opendir", "filename_format"):
+        if k in p:
+            raise SafetyError(f"'{k}' can direct I/O outside {TESTDIR}; refused")
     if re.search(r"(?i)physicaldrive|^\\\\\.\\|^[a-z]:\\?$", fn):
         raise SafetyError(f"raw device / bare drive refused: {fn}")
     path = Path(fn).resolve()
@@ -137,7 +142,12 @@ def main():
                {"filename": "C:", "direct": 1},
                {"filename": r"C:\Users\hamay\Documents\x.dat", "direct": 1},
                {"filename": str(TESTDIR / "x.dat"), "direct": 0, "rw": "randwrite"},
-               {"filename": str(TESTDIR / "x.dat"), "direct": 1, "size": 10**15}]
+               {"filename": str(TESTDIR / "x.dat"), "direct": 1, "size": 10**15},
+               {"filename": str(TESTDIR / ".." / "Users" / "x.dat"), "direct": 1},
+               {"filename": str(TESTDIR) + "-evil\\x.dat", "direct": 1},
+               {"filename": str(TESTDIR / "x.dat"), "direct": 1, "opendir": r"C:\Users"},
+               {"filename": str(TESTDIR / "x.dat"), "direct": 1, "directory": r"C:\Users"},
+               {"filename": str(TESTDIR / "x.dat"), "direct": 1, "filename_format": r"C:\Users\$jobname"}]
         good = [{"filename": str(TESTDIR / "x.dat"), "direct": 1, "size": 1 << 30},
                 {"filename": str(TESTDIR / "x.dat"), "direct": 0, "rw": "randread", "_buffered_pitfall": 1,
                  "size": 1 << 30}]

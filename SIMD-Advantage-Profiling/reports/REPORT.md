@@ -202,7 +202,7 @@ Arithmetic intensity, in FLOP per useful byte (fp32): mul 0.083, saxpy
     52 GFLOP/s, 45% of peak. That is consistent with a limit from its three
     overlapping unaligned loads.
 - **Scalar** code is compute-bound in cache. Scalar stencil runs at 100% of
-  the scalar peak and scalar saxpy at 73%. That headroom is what SIMD
+  the scalar peak and scalar saxpy at 72%. That headroom is what SIMD
   converts into speedup, and it disappears once the data comes from DRAM.
 
 ## 7. Negative and misleading cases (rubric: AI-use + failure case, 10)
@@ -243,12 +243,15 @@ Only the disassembly reveals it.
 
 - **Re-run check** (later session, fresh clone, 1 repetition;
   [RECHECK](../../RECHECK_2026-10-22.md)): 96-98% of the 320 regime values
-  reproduced within 10% (median ratio 1.00). The largest shifts:
-  - stencil f32 in L3, -15 to -17% GFLOP/s;
-  - the avx512 L2 misalignment worst case, 1.54 -> 1.90x.
-  The L2 alignment cost is therefore session-sensitive. The L1 and DRAM
-  conclusions are not.
-
+  reproduced within 10% (median ratio 1.00). Both large shifts turned out
+  to be single-repetition outliers. A targeted re-measure (5 repetitions)
+  gave:
+  - stencil f32 in L3: 28.1-28.6 GFLOP/s (avx2 / avx512), matching the
+    committed 28.2-28.3 (the re-run's 23.4 was low);
+  - avx512 L2 misalignment (saxpy f32, N=65536): median 1.48-1.49x,
+    matching the committed 1.54x (the re-run's 1.90x was high).
+  Individual repetitions range 1.03-1.51x, so the L2 alignment cost is
+  bimodal from run to run. The median is stable.
 - **No hardware counters** (Windows; perf unavailable). Cycles are derived
   from time and a measured clock, so any AVX-512 frequency licence during the
   timed loop is invisible. There is little sign of one: avx512 is >5% slower

@@ -209,8 +209,13 @@ count therefore understates memory traffic by ~2x for streaming code.
 - **Re-run check** (later session, 1 repetition, counter fractions not
   re-measured; [RECHECK](../../RECHECK_2026-10-22.md)): every size again
   within 10% **except 8 MB**, exactly the L3 capacity. There the measured
-  latency moved from 40.7 to 32.6 ns and the error rose to +31%. The 8 MB
-  point is placement-sensitive and the weakest part of the H5 verdict.
+  latency moved from 40.7 to 32.6 ns and the error rose to +31%. A targeted
+  re-measure in 9 separate processes gave 35.1-42.0 ns (median 37.9). That
+  makes the AMAT error at 8 MB +4% to +25% (median +15.5%), right at the
+  H5 limit. The latency at exactly the L3 size depends on each process's
+  physical page placement, so this is the weakest part of the H5 verdict.
+  The same 9 processes reproduced the 1024-page TLB cost exactly (1.91-1.94
+  ns vs 1.92 committed).
 
 | size | 64K | 256K | 1M | 2M | 8M | 16M | 64M |
 |---|---|---|---|---|---|---|---|
@@ -283,7 +288,7 @@ AI use, and what was independently checked, corrected or rejected:
 | H2 | seq 1T ~20, 4T 22-24 GB/s; writes ~half; random 7-8 GB/s/thread | 19.5 / 23.1; writes 0.46x; random 4.3 | mostly holds; random lower (page walk per access) |
 | H3 | knee at 60-75% of peak; ~2-3x idle at saturation; ~31 lines; K plateau 10-12 | 72-84%; 2.5x (3 thr) to 4x (6 thr); 100-164 lines system-wide; per-core demand plateau ~12 | knee slightly later; system-wide count far higher because prefetches count (consistent with the per-core ~12) |
 | H4 | runtime tracks LLC misses (r > 0.9); demand misses undercount | r 0.978 / rho 0.956 (p < 0.001, CI 0.58-0.99); demand counter sees ~54% of lines | holds; LLC-vs-demand correlation difference not significant (n = 16) |
-| H5 | AMAT within 15% | within 10% out-of-sample | holds (8 MB, at L3 capacity, reached +31% in a re-run) |
+| H5 | AMAT within 15% | within 10% out-of-sample | holds, except at 8 MB (= L3 capacity): +4% to +25% across 9 processes, median +15.5% |
 | H6 | steps at 64 (+~7 cyc) and ~2048 pages (+20-40 cyc) | +7.1 cyc at 96 pages; +35-37 cyc at 3072-8192 | holds; huge pages untested |
 | H7 | seq-chase under-reports >= 10x; unpinned noisier | 26x; unpinned NOT noisier | first holds, second does not |
 

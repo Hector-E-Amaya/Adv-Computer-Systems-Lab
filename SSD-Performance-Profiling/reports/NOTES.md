@@ -102,7 +102,9 @@
 ### Full sweeps (2026-10-22 08:34-09:19), 0 failed runs
 - 205 runs: prep 1, qd1 12, bs 96, mix 12, qd 54, tail 12, state 2,
   pitfall 15. Knees by the 90%-of-max-IOPS rule: randread QD32, randwrite
-  QD4. **Total host writes 113.8 GB** (fio io_bytes; budget 163).
+  QD4. **Sweep host writes 113.8 GB** (fio io_bytes; budget 163). All fio
+  runs including validation and smoke tests: 123.9 GB; with the re-run,
+  ~128 GB. The final audit corrected the earlier "total" wording.
 - QD1 (median of 3):
   - 4K randread 139 us (p50 134, p99 216, p99.9 399), slat 10.5 us;
   - 4K randwrite 69 us (p50 50, p99 136, p99.9 1810);
@@ -176,7 +178,31 @@
   - 4 KiB results were within 0-3%, but large reads were 26-38% slower
     (0.45-0.55 GB/s) in every rep. The read ceiling therefore varies by
     session; REPORT updated.
-  - Extra host writes: 4.28 GB (total now ~118 GB).
+  - Extra host writes: 4.28 GB (all fio runs now ~128 GB; an earlier
+    "~118 GB" here wrongly started from the sweep-only figure).
+- **Second audit (2026-10-22, 2 h):**
+  - **Independent recomputation.** Every QD1 / QD / tail / mix number was
+    recomputed straight from the raw JSON, without parse_fio. All matched.
+  - **Safety hole closed.** fio options that pick files another way
+    (`directory`, `opendir`, `filename_format`) passed `check_safety`.
+    No script ever used them, so no past run was affected. They are now
+    refused, and the self-test grew from 5 to 10 unsafe cases (also `..`
+    traversal and the look-alike folder `C:\fio-test-evil`).
+  - **Error bars added** (min..max of 3) to qd_knee, qd1_percentiles,
+    tail_latency and the rw_mix p99 panel. The tables were unchanged.
+  - **Mixed-workload p99 varies strongly between runs** (70/30 write p99
+    0.14 vs 18 ms; 50/50 read p99 3.9-24 ms). Added to the REPORT.
+  - **Read-ceiling follow-up** (read-only, data/raw/recheck_ceiling/): 5
+    back-to-back repetitions from idle.
+    - 1 MiB QD16 fell 793 -> 782 -> 598 -> 563 -> 572 MB/s.
+    - 128 KiB QD1 fell 721 -> 559 -> 461 -> 480 -> 482 MB/s.
+    - 4 KiB QD32 fell 147.5 -> 131 -> 126 -> 123 -> 124 K IOPS.
+    - So throughput falls within ~1.5 min of sustained load.
+    - powercfg (read-only): PCIe ASPM = Maximum power savings on AC.
+    - Not changed (system setting); cause still unverified.
+  - The knee for the tail runs is chosen from mean IOPS in run_sweeps.py,
+    but analyze.py reports it from the median. Both give QD32 (read) and
+    QD4 (write) on this data.
   - A first attempt failed: the clone sat in a deep temp folder, which
     exceeded the Windows 260-character path limit (fio could not open its
     output files). It was re-run from a short path (C:\Users\hamay\rc).
