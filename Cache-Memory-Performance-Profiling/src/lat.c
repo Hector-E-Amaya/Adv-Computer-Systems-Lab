@@ -98,21 +98,27 @@ static int check_cycle(int mode)
 }
 
 /* K chases, each a dependent chain; the inner loop is fully unrolled so the K
- * pointers live in registers (K <= 12 fits without spills; see build/asm). */
+ * pointers live in registers (K <= 12 fits without spills; see build/asm).
+ * The final positions are written back to pos[], so consecutive calls
+ * CONTINUE along the cycle. If every trial restarted from the same node, a
+ * trial shorter than one lap would re-walk the same subset of the buffer, and
+ * the L3 could retain part of it, understating latency for large buffers. */
 #define CHASE(K)                                                   \
-    static uintptr_t chase##K(char **start, int64_t steps)         \
+    static uintptr_t chase##K(char **pos, int64_t steps)           \
     {                                                              \
         char *p[K];                                                \
         for (int k = 0; k < K; k++)                                \
-            p[k] = start[k];                                       \
+            p[k] = pos[k];                                         \
         for (int64_t s = 0; s < steps; s++) {                      \
             _Pragma("GCC unroll 16")                               \
             for (int k = 0; k < K; k++)                            \
                 p[k] = *(char **)p[k];                             \
         }                                                          \
         uintptr_t x = 0;                                           \
-        for (int k = 0; k < K; k++)                                \
+        for (int k = 0; k < K; k++) {                              \
+            pos[k] = p[k];                                         \
             x ^= (uintptr_t)p[k];                                  \
+        }                                                          \
         return x;                                                  \
     }
 CHASE(1) CHASE(2) CHASE(3) CHASE(4) CHASE(6) CHASE(8) CHASE(10) CHASE(12) CHASE(14) CHASE(16)
@@ -122,7 +128,7 @@ static const struct { int k; uintptr_t (*fn)(char **, int64_t); } chasers[] = {
     {10, chase10}, {12, chase12}, {14, chase14}, {16, chase16},
 };
 
-static void usage(void)
+__attribute__((noreturn)) static void usage(void)
 {
     fprintf(stderr,
             "usage: lat --size BYTES[K|M|G] [--mode random|seq|page] [--k 1..16]\n"
@@ -195,12 +201,29 @@ int main(int argc, char **argv)
 
     if (o.check) {
         int ok = check_cycle(o.mode);
-        printf("%s lat mode=%s size=%zu nodes=%zu pages=%s single-cycle check\n",
-               ok ? "PASS" : "FAIL", mode_name[o.mode], o.size, nnodes, o.large ? "2M" : "4K");
-        return ok ? 0 : 1;
+        /* Continuation: two chase calls of s steps must end where a plain walk
+         * of 2s steps ends (trials continue along the cycle, never restart). */
+        int64_t s = (int64_t)(nnodes / 3 + 1);
+        char *pos[1] = {node_addr(0, o.mode)}, *walk = pos[0];
+        chase1(pos, s);
+        chase1(pos, s);
+        for (int64_t i = 0; i < 2 * s; i++)
+            walk = *(char **)walk;
+        int cont = pos[0] == walk;
+        printf("%s lat mode=%s size=%zu nodes=%zu pages=%s single-cycle=%s continuation=%s\n",
+               ok && cont ? "PASS" : "FAIL", mode_name[o.mode], o.size, nnodes,
+               o.large ? "2M" : "4K", ok ? "ok" : "BAD", cont ? "ok" : "BAD");
+        return ok && cont ? 0 : 1;
     }
 
-    /* K start points spread evenly along the cycle. */
+    /* Warm-up: one full lap (capped) loads caches and TLBs to steady state.
+     * It uses its own cursor, so the K start points below stay evenly spaced. */
+    {
+        char *w[1] = {node_addr(0, o.mode)};
+        sink ^= chase1(w, nnodes < (1u << 24) ? (int64_t)nnodes : (1 << 24));
+    }
+
+    /* K start points spread evenly along the cycle; chase calls advance them. */
     char *start[16];
     {
         char *p = node_addr(0, o.mode);
@@ -211,9 +234,6 @@ int main(int argc, char **argv)
                 p = *(char **)p;
         }
     }
-
-    /* Warm-up: one full lap (capped) loads caches and TLBs to steady state. */
-    sink ^= chase1(start, nnodes < (1u << 24) ? (int64_t)nnodes : (1 << 24));
 
     double ghz0 = measure_ghz();
     int64_t steps = 1024;

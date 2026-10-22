@@ -18,6 +18,7 @@ mkdir -p build/asm
 # (GCC PR 54412); the assembler flag makes such spills unaligned-safe.
 FLAGS="-O2 -std=gnu11 -march=x86-64-v3 -Wall -Wextra -Wa,-muse-unaligned-vector-move -Isrc"
 
+# test.sh checks that kern's saxpy and mul are both vectorized (ymm).
 for t in lat bw loaded kern; do
     echo "[$t]"
     $CC $FLAGS src/common.c src/$t.c -o build/$t.exe -lm

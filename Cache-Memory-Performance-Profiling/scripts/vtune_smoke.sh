@@ -48,7 +48,10 @@ failed=0
 log() { echo "$*" | tee -a "$OUT"; }
 
 : > "$OUT"
-log "# vtune smoke $(date -u +%Y-%m-%dT%H:%M:%SZ), commit $(git rev-parse --short HEAD), results in $RUN"
+# As administrator, git may refuse the user-owned repo ("dubious ownership"):
+# fall back quietly instead of printing an alarming error.
+COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)
+log "# vtune smoke $(date -u +%Y-%m-%dT%H:%M:%SZ), commit $COMMIT, results in $RUN"
 "$V" --version >> "$OUT" 2>&1 || { log "FAIL: vtune --version"; failed=1; }
 
 # check_events NAME CMD...: collect the event set, export a CSV report, and

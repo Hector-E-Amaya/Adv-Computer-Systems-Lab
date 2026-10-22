@@ -47,7 +47,45 @@
 - The DRAM minimum also drifted between sessions: 106 ns earlier,
   111-113 ns later the same day.
 
-### Correctness suite (`scripts/test.sh`, 353 checks, all pass)
+### Pre-sweep code review (every source file and script, before Batch 2)
+Real bugs, all fixed, each with a regression test in `scripts/test.sh`:
+- **B5 lat: trials restarted from the same node.** A trial shorter than one
+  lap re-walked the same subset (e.g. ~450K of 8M nodes at 512 MB), and the L3
+  could retain part of it. Fix: chase positions persist across calls. Test:
+  two s-step calls == one 2s-step walk. **Measured effect** (old vs fixed, back
+  to back, 3 runs each): 256 MB within noise; 512 MB K=1 old minimum 1-2%
+  lower (106.9-108.5 vs 109.2-109.8 ns). Small but in the predicted
+  direction.
+- **B1 bw:** the main thread, pinned to worker 0's CPU, busy-spun while
+  workers started, delaying worker 0. Fix: SwitchToThread. Test: wall time
+  bounded.
+- **B2 bw:** line rate and DRAM estimate used the mean of trials, useful GB/s
+  the median. Fix: all from the median trial. Test: mlines x gran == useful.
+- **B3 bw --smt:** CPU order 2,3,4,... put 2 threads on one physical core.
+  Fix: one per core, then siblings. Test: 2 threads -> "2 4"; 5 -> "2 4 6 0 3".
+- **B7 loaded:** 256-line blocks made 30% writes really 30.5%. Fix: 250-line
+  blocks. The delay count is now a local, so its cost no longer includes a
+  reload. Test: delay 0 vs 400 traffic ratio.
+- **B8 bw:** partial-line non-temporal stores break the DRAM-traffic model.
+  Fix: --nt needs --gran 64 for measurements (allowed in --check).
+- **Latent:** a topology read failure would divide by zero, and >32 cores
+  would overflow cpus[64] (bw, loaded). Fix: guards. Also `usage()` marked
+  noreturn; the build is warning-free.
+- vtune_smoke.sh: git "dubious ownership" noise under admin, now quiet with a
+  fallback.
+
+**My own false finding, caught:** "B4: kern saxpy not vectorized at -O2" was
+wrong. gcc names the specialised copy `saxpy.constprop.0`, and my
+exact-label search for `saxpy:` found nothing. With correct matching, -O2
+vectorizes both kernels (`vfmadd213ps`/`vmulps` on ymm; -fopt-info confirms
+lines 23 and 30). The -O3 "fix" was reverted. The asm test now matches any
+specialised suffix and checks both kernels.
+
+Test-script bugs caught by running the suite (not measurement bugs): `bc`
+not installed (timing now via Python), and Windows Python needing an
+absolute exe path.
+
+### Correctness suite (`scripts/test.sh`, now 361 checks, all pass)
 - lat single-cycle check: random/seq/page modes, 128 B .. 256 MB.
 - **Mutation:** `lat_mutant` (Fisher-Yates instead of Sattolo, which can
   split into several cycles) fails the check at 64K/1M/16M as required.

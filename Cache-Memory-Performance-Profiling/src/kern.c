@@ -31,7 +31,7 @@ __attribute__((noinline)) static void mul(size_t n, const float *restrict x,
         z[i] = x[i] * y[i];
 }
 
-static void usage(void)
+__attribute__((noreturn)) static void usage(void)
 {
     fprintf(stderr, "usage: kern --kernel saxpy|mul --n N [--seconds S] [--large] [--check]\n"
                     "       kern --header\n");

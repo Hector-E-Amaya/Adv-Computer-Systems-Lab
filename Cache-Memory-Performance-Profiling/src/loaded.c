@@ -21,7 +21,7 @@ struct traffic {
     int cpu, delay, wpct;
     uint64_t *buf;
     size_t lines;
-    volatile int64_t done; /* lines completed, published every 256 lines */
+    volatile int64_t done; /* lines completed, published every 250 lines */
     uint64_t sum;
 };
 
@@ -39,9 +39,10 @@ static DWORD WINAPI traffic_main(void *arg)
     size_t k = 0;
     int64_t done = 0;
     uint64_t sum = 0;
-    const int wr = t->wpct / 10;
+    const int wr = t->wpct / 10, delay = t->delay;
+    /* Blocks of 250 lines (a multiple of 10) keep the R/W mix exact. */
     while (!stop) {
-        for (int c = 0; c < 256; c++) {
+        for (int c = 0; c < 250; c++) {
             uint64_t *p = t->buf + k * 8;
             if (c % 10 < wr)
                 p[0] = k;
@@ -49,10 +50,10 @@ static DWORD WINAPI traffic_main(void *arg)
                 sum += p[0];
             if (++k == t->lines)
                 k = 0;
-            for (int d = 0; d < t->delay; d++)
-                __asm__ volatile("" ::: "memory");
+            for (int d = 0; d < delay; d++)
+                __asm__ volatile("");
         }
-        done += 256;
+        done += 250;
         t->done = done;
     }
     t->sum = sum;
@@ -84,7 +85,7 @@ static char *chase(char *p, int64_t steps)
     return p;
 }
 
-static void usage(void)
+__attribute__((noreturn)) static void usage(void)
 {
     fprintf(stderr,
             "usage: loaded --threads T --delay D [--wpct 0|30|50|100] [--chase-size BYTES]\n"
@@ -130,7 +131,11 @@ int main(int argc, char **argv)
 
     /* Chase on core 1; traffic on cores 2, 3, 0 (core 0 last: OS interrupts).
      * --smt adds the chase core's sibling and the other siblings. */
-    int cores[64], ncore = core_cpus(cores, 64), cpus[64], ncpu = 0;
+    int cores[32], ncore = core_cpus(cores, 32), cpus[64], ncpu = 0; /* <= 32 cores fits cpus[64] */
+    if (ncore < 1) {
+        fprintf(stderr, "could not read the CPU topology\n");
+        return 2;
+    }
     int chase_cpu = cores[1 % ncore];
     for (int i = 2; i < ncore + 1; i++)
         cpus[ncpu++] = cores[i % ncore];

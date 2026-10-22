@@ -79,6 +79,36 @@ done
 echo "[5] kern reference checks"
 for k in saxpy mul; do for n in 1 7 1000 1000003; do expect_exit 0 build/kern.exe --kernel $k --n $n --check; done; done
 
+echo "[5b] regressions for bugs found in the pre-sweep code review"
+# B8: partial-line non-temporal measurements are refused
+expect_exit 2 build/bw.exe --size 1M --nt --gran 8 --trials 1
+# B3: --smt places one thread per physical core before any sibling
+cpus2=$(build/bw.exe --size 1M --threads 2 --smt --dur 0.02 --trials 1 | awk -F, '{print $NF}')
+[ "$cpus2" = "2 4" ] && ok "bw --smt 2 threads on separate cores ($cpus2)" || bad "bw --smt 2 threads cpus = '$cpus2', want '2 4'"
+cpus5=$(build/bw.exe --size 1M --threads 5 --smt --dur 0.02 --trials 1 | awk -F, '{print $NF}')
+[ "$cpus5" = "2 4 6 0 3" ] && ok "bw --smt 5 threads: cores first, then a sibling ($cpus5)" || bad "bw --smt 5 threads cpus = '$cpus5'"
+# B2: line rate and useful GB/s come from the same trial
+row=$(build/bw.exe --size 1M --gran 32 --dur 0.02 --trials 5)
+in_range "bw mlines/s x gran / useful GB/s (same trial)" \
+    "$(echo "$row" | awk -F, '{print $14 * $4 / 1000 / $11}')" 0.999 1.001
+# B1: worker start is not delayed by the main thread spinning on worker 0's CPU
+wall=$(python -c "import os, subprocess, time
+t = time.perf_counter()
+subprocess.run([os.path.abspath('build/bw.exe'), '--size', '1M', '--threads', '4', '--dur', '0.1', '--trials', '5'], capture_output=True)
+print(time.perf_counter() - t)")
+in_range "bw 4 threads, 6 x 0.1 s trials: wall seconds" "$wall" 0.5 3
+# B4: both kernels vectorized (256-bit)
+for f in saxpy mul; do
+    # gcc may emit a specialised copy (e.g. saxpy.constprop.0): match any suffix
+    n=$(awk -v f="$f" '$0 ~ "^"f"[.a-z0-9]*:$" {on=1} on' build/asm/kern.s | sed '/seh_endproc/q' |
+        grep -cE 'v(fmadd[0-9]+|mul)ps.*ymm')
+    [ "$n" -gt 0 ] && ok "asm: kern $f uses ymm packed math" || bad "asm: kern $f not vectorized"
+done
+# loaded: more delay must mean less traffic (the delay loop is not optimized away)
+fast=$(build/loaded.exe --threads 1 --delay 0 --trials 3 --window 0.02 | cut -d, -f10)
+slow=$(build/loaded.exe --threads 1 --delay 400 --trials 3 --window 0.02 | cut -d, -f10)
+in_range "loaded traffic GB/s, delay 0 / delay 400" "$(python -c "print($fast/$slow)")" 3 1000
+
 echo "[6] asm: chase loops"
 chase_loop() { awk -v f="$1:" '$0==f{on=1} on' build/asm/lat.s | awk '/^\.L[0-9]+:/{n++} n==1'; }
 c1=$(chase_loop chase1)

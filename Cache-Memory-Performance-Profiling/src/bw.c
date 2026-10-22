@@ -248,8 +248,10 @@ static double run_trial(struct worker *ws, int n)
     go = 0;
     for (int i = 0; i < n; i++)
         h[i] = CreateThread(NULL, 0, work, &ws[i], 0, NULL);
+    /* The main thread shares worker 0's CPU (pinned there for measure_ghz), so
+     * it must yield while waiting, or it delays worker 0 from starting. */
     while (ready < n)
-        _mm_pause();
+        SwitchToThread();
     go = 1;
     WaitForMultipleObjects(n, h, TRUE, INFINITE);
     double t0 = ws[0].t0, t1 = ws[0].t1, lines = 0;
@@ -262,7 +264,7 @@ static double run_trial(struct worker *ws, int n)
     return lines / (t1 - t0); /* lines per second, all threads */
 }
 
-static void usage(void)
+__attribute__((noreturn)) static void usage(void)
 {
     fprintf(stderr,
             "usage: bw [--size BYTES/thread] [--threads T] [--smt] [--pattern seq|stride|random]\n"
@@ -320,6 +322,12 @@ int main(int argc, char **argv)
         g.wpct < 0 || g.wpct > 100 || g.threads < 1 || g.trials < 1 ||
         g.stride < LINE || (g.stride & (g.stride - 1)))
         usage(); /* stride: power of two, >= 64 */
+    if (g.nt && g.gran != 64 && !g.check) {
+        /* Partial-line non-temporal stores leave write-combining buffers part
+         * full; the DRAM-traffic model (one 64 B write per line) does not hold. */
+        fprintf(stderr, "--nt requires --gran 64 for measurements (allowed with --check)\n");
+        return 2;
+    }
 
     size_t L = 1;
     int lbits = 0;
@@ -333,19 +341,21 @@ int main(int argc, char **argv)
     timer_init();
 
     int cpus[64], ncpu;
-    if (g.smt) { /* every logical CPU, siblings adjacent */
-        SYSTEM_INFO si;
-        GetSystemInfo(&si);
-        ncpu = (int)si.dwNumberOfProcessors;
-        for (int i = 0; i < ncpu; i++)
-            cpus[i] = (i + 2) % ncpu; /* start at core 1, core 0 last */
-    } else {
-        int cores[64];
-        ncpu = core_cpus(cores, 64);
-        for (int i = 0; i < ncpu; i++)
-            cpus[i] = cores[(i + 1) % ncpu]; /* core 1 first, core 0 (OS interrupts) last */
+    /* One logical CPU per physical core first (core 1 first, core 0 last: OS
+     * interrupts); with --smt the siblings (cpu + 1) follow, so T threads
+     * never share a core while a free core remains. */
+    int cores[32], ncore = core_cpus(cores, 32); /* <= 32 cores keeps cpus[64] in bounds */
+    if (ncore < 1) {
+        fprintf(stderr, "could not read the CPU topology\n");
+        return 2;
     }
-    if (g.threads > ncpu) {
+    ncpu = 0;
+    for (int i = 0; i < ncore; i++)
+        cpus[ncpu++] = cores[(i + 1) % ncore];
+    if (g.smt)
+        for (int i = 0; i < ncore; i++)
+            cpus[ncpu++] = cores[(i + 1) % ncore] + 1;
+    if (g.threads < 1 || g.threads > ncpu) { /* re-checked here so the allocation is provably sized */
         fprintf(stderr, "only %d CPUs available for --threads\n", ncpu);
         return 2;
     }
@@ -371,17 +381,15 @@ int main(int argc, char **argv)
     pin_thread(cpus[0]);
     double ghz0 = measure_ghz();
     run_trial(ws, g.threads); /* warm-up, discarded */
-    double *gb = malloc(g.trials * sizeof *gb), lps_sum = 0;
-    for (int r = 0; r < g.trials; r++) {
-        double lps = run_trial(ws, g.threads);
-        gb[r] = lps * g.gran / 1e9;
-        lps_sum += lps;
-    }
+    double *gb = malloc(g.trials * sizeof *gb);
+    for (int r = 0; r < g.trials; r++)
+        gb[r] = run_trial(ws, g.threads) * g.gran / 1e9;
     double ghz1 = measure_ghz();
-    double lps = lps_sum / g.trials;
+    double med = median(gb, g.trials);
+    /* Line rate and DRAM estimate from the same (median) trial as useful GB/s. */
+    double lps = med * 1e9 / g.gran;
     double wfrac = g.wpct / 100.0;
     double dram = lps * LINE * (1 + (g.nt ? 0 : wfrac)) / 1e9;
-    double med = median(gb, g.trials);
     printf("bw,%s,%d,%d,%d,%d,%d,%zu,%s,%d,%.4f,%.4f,%.4f,%.3f,%.4f,%.4f,%.4f,", pat_name[g.pattern],
            g.pattern == P_STRIDE ? g.stride : 64, g.gran, g.wpct, g.nt, g.threads, L * LINE,
            g.large ? "2M" : "4K", g.trials, med, gb[0], gb[g.trials - 1], lps / 1e6, dram, ghz0,

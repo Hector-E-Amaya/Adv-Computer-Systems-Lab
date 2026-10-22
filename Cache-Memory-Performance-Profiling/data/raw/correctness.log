@@ -1,25 +1,25 @@
-# correctness run 2026-10-21T23:31:30Z, commit d7ebccb
+# correctness run 2026-10-22T00:12:26Z, commit 36f91e5
 core 0: logical cpus 0 1
 core 1: logical cpus 2 3
 core 2: logical cpus 4 5
 core 3: logical cpus 6 7
 PASS topology: 4 cores, SMT siblings adjacent
-PASS lat mode=random size=128 nodes=2 pages=4K single-cycle check
-PASS lat mode=random size=4096 nodes=64 pages=4K single-cycle check
-PASS lat mode=random size=65536 nodes=1024 pages=4K single-cycle check
-PASS lat mode=random size=1048576 nodes=16384 pages=4K single-cycle check
-PASS lat mode=random size=16777216 nodes=262144 pages=4K single-cycle check
-PASS lat mode=random size=268435456 nodes=4194304 pages=4K single-cycle check
-PASS lat mode=seq size=4096 nodes=64 pages=4K single-cycle check
-PASS lat mode=seq size=1048576 nodes=16384 pages=4K single-cycle check
-PASS lat mode=page size=8192 nodes=2 pages=4K single-cycle check
-PASS lat mode=page size=65536 nodes=16 pages=4K single-cycle check
-PASS lat mode=page size=1048576 nodes=256 pages=4K single-cycle check
-PASS lat mode=page size=8388608 nodes=2048 pages=4K single-cycle check
-PASS lat mode=page size=33554432 nodes=8192 pages=4K single-cycle check
-FAIL lat mode=random size=65536 nodes=1024 pages=4K single-cycle check
-FAIL lat mode=random size=1048576 nodes=16384 pages=4K single-cycle check
-FAIL lat mode=random size=16777216 nodes=262144 pages=4K single-cycle check
+PASS lat mode=random size=128 nodes=2 pages=4K single-cycle=ok continuation=ok
+PASS lat mode=random size=4096 nodes=64 pages=4K single-cycle=ok continuation=ok
+PASS lat mode=random size=65536 nodes=1024 pages=4K single-cycle=ok continuation=ok
+PASS lat mode=random size=1048576 nodes=16384 pages=4K single-cycle=ok continuation=ok
+PASS lat mode=random size=16777216 nodes=262144 pages=4K single-cycle=ok continuation=ok
+PASS lat mode=random size=268435456 nodes=4194304 pages=4K single-cycle=ok continuation=ok
+PASS lat mode=seq size=4096 nodes=64 pages=4K single-cycle=ok continuation=ok
+PASS lat mode=seq size=1048576 nodes=16384 pages=4K single-cycle=ok continuation=ok
+PASS lat mode=page size=8192 nodes=2 pages=4K single-cycle=ok continuation=ok
+PASS lat mode=page size=65536 nodes=16 pages=4K single-cycle=ok continuation=ok
+PASS lat mode=page size=1048576 nodes=256 pages=4K single-cycle=ok continuation=ok
+PASS lat mode=page size=8388608 nodes=2048 pages=4K single-cycle=ok continuation=ok
+PASS lat mode=page size=33554432 nodes=8192 pages=4K single-cycle=ok continuation=ok
+FAIL lat mode=random size=65536 nodes=1024 pages=4K single-cycle=BAD continuation=ok
+FAIL lat mode=random size=1048576 nodes=16384 pages=4K single-cycle=BAD continuation=ok
+FAIL lat mode=random size=16777216 nodes=262144 pages=4K single-cycle=BAD continuation=ok
 PASS bw pattern=seq stride=64 gran=8 wpct=0 nt=0 lines=4096
 PASS bw pattern=seq stride=64 gran=8 wpct=0 nt=0 lines=2048
 PASS bw pattern=seq stride=64 gran=8 wpct=0 nt=1 lines=4096
@@ -348,12 +348,20 @@ PASS kern kernel=mul n=1 max_rel_err=0
 PASS kern kernel=mul n=7 max_rel_err=4.33e-08
 PASS kern kernel=mul n=1000 max_rel_err=5.77e-08
 PASS kern kernel=mul n=1000003 max_rel_err=5.77e-08
+--nt requires --gran 64 for measurements (allowed with --check)
+PASS bw --smt 2 threads on separate cores (2 4)
+PASS bw --smt 5 threads: cores first, then a sibling (2 4 6 0 3)
+PASS bw mlines/s x gran / useful GB/s (same trial) = 1 in [0.999, 1.001]
+PASS bw 4 threads, 6 x 0.1 s trials: wall seconds = 0.8762131999974372 in [0.5, 3]
+PASS asm: kern saxpy uses ymm packed math
+PASS asm: kern mul uses ymm packed math
+PASS loaded traffic GB/s, delay 0 / delay 400 = 16.9625 in [3, 1000]
 PASS asm: chase1 is a dependent load chain
 PASS asm: chase12 keeps all 12 chains in registers
-PASS L1 latency, cycles (Willow Cove: 5) = 4.88 in [4.5, 6]
-PASS DRAM latency (min), ns = 112.5723 in [60, 200]
-PASS loaded(idle) / lat latency, both min = 0.9618351939153771 in [0.95, 1.05]
-PASS K=8 / K=1 throughput from min latencies (MLP works; physical max 8) = 7.0137209693282125 in [3, 8]
-PASS seq read, 1 thread, GB/s = 19.2720 in [12, 25.6]
-PASS seq read, 4 threads, GB/s (<= 25.6 channel peak) = 22.3783 in [15, 25.6]
-# total: pass=353 fail=0
+PASS L1 latency, cycles (Willow Cove: 5) = 4.82 in [4.5, 6]
+PASS DRAM latency (min), ns = 105.6647 in [60, 200]
+PASS loaded(idle) / lat latency, both min = 1.003996604353204 in [0.95, 1.05]
+PASS K=8 / K=1 throughput from min latencies (MLP works; physical max 8) = 7.77037070498421 in [3, 8]
+PASS seq read, 1 thread, GB/s = 15.9144 in [12, 25.6]
+PASS seq read, 4 threads, GB/s (<= 25.6 channel peak) = 22.1441 in [15, 25.6]
+# total: pass=361 fail=0
