@@ -27,6 +27,6 @@ rubric allows as "an equivalent memory benchmark".
 - [x] Step 1: repo skeleton and environment capture (`data/raw/env.txt`, `env_notes.txt`)
 - [x] Step 2: pre-experiment hypotheses (`reports/HYPOTHESES.md`)
 - [x] Batch 1: benchmarks, build, correctness/sanity tests; VTune smoke test passed and validated
-- [~] Batch 2: sweeps done (run 2 + re-measured flags); VTune counter runs pending (admin)
-- [ ] Batch 3: analysis, plots, AMAT / Little's Law, pitfall demo
+- [x] Batch 2: sweeps (quiet run 2 + re-measured flags) and 45 VTune counter runs
+- [x] Batch 3: analysis, plots, AMAT / Little's Law, pitfalls (`scripts/analyze.py`, `reports/RESULTS_TABLES.md`)
 - [ ] Batch 4: AI-USE.md and REPORT.md

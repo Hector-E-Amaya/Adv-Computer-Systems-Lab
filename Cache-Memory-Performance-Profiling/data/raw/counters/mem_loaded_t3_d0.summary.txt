@@ -1,0 +1,70 @@
+Elapsed Time: 7.273s
+    CPU Time: 25.138s
+    Memory Bound: 75.5% of Pipeline Slots
+     | The metric value is high. This may indicate that a significant fraction
+     | of execution pipeline slots could be stalled due to demand memory load
+     | and stores. Explore the metric breakdown by memory hierarchy, memory
+     | bandwidth information, and correlation by memory objects.
+     |
+        L1 Bound: 2.3% of Clockticks
+        L2 Bound: 3.2% of Clockticks
+        L3 Bound: 17.1% of Clockticks
+         | This metric shows how often CPU was stalled on L3 cache, or contended
+         | with a sibling Core. Avoiding cache misses (L2 misses/L3 hits)
+         | improves the latency and increases performance.
+         |
+        DRAM Bound: 51.6% of Clockticks
+         | This metric shows how often CPU was stalled on the main memory
+         | (DRAM). Caching typically improves the latency and increases
+         | performance.
+         |
+            DRAM Bandwidth Bound: 88.1% of Elapsed Time
+             | The system spent much time heavily utilizing DRAM bandwidth.
+             | Improve data accesses to reduce cacheline transfers from/to
+             | memory using these possible techniques: 1) consume all bytes of
+             | each cacheline before it is evicted (for example, reorder
+             | structure elements and split non-hot ones); 2) merge compute-
+             | limited and bandwidth-limited loops; 3) use NUMA optimizations on
+             | a multi-socket system. Note: software prefetches do not help a
+             | bandwidth-limited application. Run Memory Access analysis to
+             | identify data structures to be allocated in High Bandwidth Memory
+             | (HBM), if available.
+             |
+        Store Bound: 0.1% of Clockticks
+    Loads: 4,613,538,402
+    Stores: 216,706,501
+    LLC Miss Count: 1,059,744,906
+    Total Memory Traffic, GB: 0.000
+        Read Traffic from Local Memory, GB: 0.000
+        Read Traffic from Remote Memory, GB: 0.000
+        Read Traffic from Sub-NUMA Memory, GB: 0.000
+        Write Memory Traffic, GB: 0.000
+    Average Latency (cycles): 111
+    Total Thread Count: 6
+    Paused Time: 0s
+
+Bandwidth Utilization
+Bandwidth Domain  Platform Maximum  Observed Maximum  Average  % of Elapsed Time with High BW Utilization(%)
+----------------  ----------------  ----------------  -------  ---------------------------------------------
+DRAM, GB/sec      24                          23.100   20.708                                          88.1%
+Collection and Platform Info
+    Application Command Line: build/loaded.exe "--threads" "3" "--delay" "0" "--window" "0.25" "--trials" "20" 
+    Operating System: Microsoft Windows 11
+    Computer Name: HectorAs-HP
+    Result Size: 122.6 MB 
+    Collection start time: 11:30:00 22/10/2026 UTC
+    Collection stop time: 11:30:08 22/10/2026 UTC
+    Collector Type: Event-based sampling driver
+    CPU
+        Name: Intel(R) microarchitecture code named Tigerlake
+        Frequency: 1.997 GHz
+        Logical CPU Count: 8
+        Max DRAM Single-Package Bandwidth: 24.000 GB/s
+        Cache Allocation Technology
+            Level 2 capability: not detected
+            Level 3 capability: not detected
+
+If you want to skip descriptions of detected performance issues in the report,
+enter: vtune -report summary -report-knob show-issues=false -r <my_result_dir>.
+Alternatively, you may view the report in the csv format: vtune -report
+<report_name> -format=csv.

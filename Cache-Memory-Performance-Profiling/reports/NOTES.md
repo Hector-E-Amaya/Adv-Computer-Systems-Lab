@@ -283,6 +283,39 @@ means the report has numbers.
   fixed in the stand-in, not the script. Stand-in output verified fake and
   removed.
 
+### Counter run (45/45 PASS) + Batch 3 analysis (`scripts/analyze.py`)
+- **Counter validation:**
+  - saxpy 0.752 instr/elem (0.75 expected); L2 lines in +0.7%;
+  - chase1 loads (instr/2.5) = L1_HIT exactly at 16 KB;
+  - write model 15.6 vs VTune 15.3 GB/s; knee top est 22.0 vs VTune avg 20.7 /
+    max 23.1 (avg includes setup).
+- **Evidence for student concerns 15/16/19:**
+  - seq chase 1.015 L2 line fills and 0.89 LLC misses per load (from DRAM);
+  - TLB at 3072 pages: page and control both ~100% L2, walks 0.85 vs 0
+    per load (the step is TLB);
+  - bw at 4 MB: 0.86% of line fills miss L3 (L3-served).
+- **VTune attribution:** with -g, the bw loop's inlined intrinsics appear as
+  separate "mm256_add_epi64" rows. These are summed with run_seq_8 (line fills
+  then match expected within 1.2%).
+- **Analysis bugs caught in review (fixed before commit):**
+  - AMAT fractions normalised by exact loads gave 116-123% DRAM at
+    64-256 MB: VTune multiplexes 7 events and scales them separately.
+    Fractions are now normalised within the MEM_LOAD buckets; the ratio is
+    reported as a quality column.
+  - t_L3 was taken from the 4 MB latency, which already includes TLB cost,
+    then TLB was added again (double count: +17.7%). Pure t_L3 = 11.0 ns and
+    t_DRAM = 82.5 ns are now solved from 4 MB + 256 MB; every other size is
+    out-of-sample, all within 10% (H5 target 15%).
+  - Knee curves were connected sorted by bandwidth (zig-zag at
+    saturation); now ordered by injection rate.
+- **Results:**
+  - knee (1.5x idle) at 18.6-21.4 GB/s = 72-84% of the 25.6 peak (H3
+    predicted 60-75%); 1 traffic thread never reaches it;
+  - Little's Law at the top points: 100-164 lines in flight (prefetches
+    included);
+  - kernel time vs LLC misses/elem: Pearson 0.978, Spearman 0.956;
+    demand-only L3 misses: 0.753 / 0.882 (counter choice matters, H4).
+
 ### Correctness suite (`scripts/test.sh`, now 366 checks, all pass)
 - lat single-cycle check: random/seq/page modes, 128 B .. 256 MB.
 - **Mutation:** `lat_mutant` (Fisher-Yates instead of Sattolo, which can
