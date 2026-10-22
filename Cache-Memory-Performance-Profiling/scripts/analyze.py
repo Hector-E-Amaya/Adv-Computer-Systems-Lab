@@ -369,7 +369,52 @@ md += table(["kernel", "n", "footprint B", "ns/elem", "L2 lines in/elem", "LLC m
              "instr/elem"], [[r[0], r[1], str(r[2])] + r[3:] for r in kbody2], fmt="{:.4f}")
 md += ["", "Correlation with ns/elem over all 16 runs:", ""]
 md += table(["counter", "Pearson r", "Spearman rho"], corr, fmt="{:.3f}")
-md += [""]
+
+# Statistical verification (n = 16, clustered by cache level, kernels share
+# sizes): permutation p-values for Spearman, bootstrap 95% CIs (resampling
+# runs), and a paired bootstrap of rho(LLC) - rho(demand). Fixed seed.
+import random  # noqa: E402
+
+rng = random.Random(4320)
+B = 10000
+
+
+def spear(a, b):
+    return pearson(ranks(a), ranks(b))
+
+
+stats = []
+cols = {lab: [r[j] for r in kbody2] for j, lab in ((4, "L2 lines in"), (5, "LLC misses"), (6, "demand L3 misses"))}
+for lab, v in cols.items():
+    rho = spear(ns_, v)
+    perm = sum(abs(spear(ns_, rng.sample(v, len(v)))) >= abs(rho) for _ in range(B))
+    boot = []
+    for _ in range(B):
+        idx = [rng.randrange(len(v)) for _ in v]
+        a, b = [ns_[i] for i in idx], [v[i] for i in idx]
+        if len(set(a)) > 1 and len(set(b)) > 1:
+            boot.append(spear(a, b))
+    boot.sort()
+    p = (perm + 1) / (B + 1)
+    stats.append([lab, rho, "< 0.001" if p < 0.001 else f"{p:.3f}", boot[int(0.025 * len(boot))],
+                  boot[int(0.975 * len(boot))]])
+diff = []
+for _ in range(B):
+    idx = [rng.randrange(len(ns_)) for _ in ns_]
+    a = [ns_[i] for i in idx]
+    x, y = [cols["LLC misses"][i] for i in idx], [cols["demand L3 misses"][i] for i in idx]
+    if len(set(a)) > 1 and len(set(x)) > 1 and len(set(y)) > 1:
+        diff.append(spear(a, x) - spear(a, y))
+diff.sort()
+dlo, dhi = diff[int(0.025 * len(diff))], diff[int(0.975 * len(diff))]
+pgt = sum(d <= 0 for d in diff) / len(diff)
+write_csv("correlation_stats.csv", ["counter", "spearman", "perm_p", "ci95_lo", "ci95_hi"], stats)
+md += ["", f"Statistical check (n = 16; {B} permutations / bootstrap resamples, seed 4320). "
+           "Points are clustered by cache level and the two kernels share sizes, so "
+           "the effective sample is smaller than 16 and the CIs are the honest measure:", ""]
+md += table(["counter", "Spearman rho", "permutation p", "bootstrap 95% CI low", "high"], stats, fmt="{:.3f}")
+md += ["", f"rho(LLC misses) - rho(demand L3 misses): bootstrap 95% CI [{dlo:.3f}, {dhi:.3f}], "
+           f"fraction of resamples <= 0: {pgt:.3f}.", ""]
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.8))
 for j, kname in enumerate(("saxpy", "mul")):
     rs = [r for r in kbody2 if r[0] == kname]

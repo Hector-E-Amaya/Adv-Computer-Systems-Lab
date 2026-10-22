@@ -42,6 +42,14 @@ attributed accurately. Commit hashes point to the evidence.
 | 19 | L3 51 GB/s agreeing with Project 1 doesn't prove L3 served it | Valid: consistency is not proof | **Confirmed by counters:** only 0.86% of line fills at 4 MB miss L3, i.e. L3-served |
 | 20 | Pinning negative result is legitimate | Agreed | Reported as a negative result |
 
+### Review of the final results (2026-10-22)
+| # | Concern (student) | Verdict after checking | Outcome |
+|---|---|---|---|
+| 21 | AMAT validation holds only if test sizes were excluded from calibration | Valid check; it holds | All 7 test sizes excluded. Report now states that 64/256 KB are near-trivial (pure L2) and the meaningful tests are 1-64 MB (5-10% error) |
+| 22 | Knee at 72-84% is a reasonable departure from the hypothesis | Agreed | Reported in the scorecard |
+| 23 | 100-164 outstanding requests looks inconsistent with ~12 per core | Fair flag; consistent once scope is stated | ~12 = per-core demand misses (random chase); 100-164 = system-wide with prefetches; one core's sequential read alone keeps ~35 in flight. Reconciliation added to the report |
+| 24 | Correlation 0.96-0.98 needs statistical verification | **Valid, and it changed a conclusion** | Permutation p < 0.001 for all three, but wide bootstrap CIs, and the LLC-vs-demand difference is **not significant** (CI [-0.035, 0.362]). The report now rests "counter choice matters" on the direct line-count evidence instead |
+
 ## Found by the assistant's own testing (for accurate attribution)
 - `bw` first version was CPU-bound (10 GB/s vs 20.8 GB/s expected); rewritten twice (352e811).
 - DRAM-latency run-to-run noise: medians drift 10-25%, minima stable (352e811).

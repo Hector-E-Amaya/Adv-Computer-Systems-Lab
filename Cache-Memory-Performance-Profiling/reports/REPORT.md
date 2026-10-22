@@ -154,8 +154,18 @@ exceeds 1.5x idle = 171 ns.**
     effective per-core concurrency limit of ~12.
   - This does not identify the structure: fill buffers and page walkers
     (every random access walks) are both candidates.
-- **System-wide,** the top points imply 100-164 lines in flight. That is only
-  possible because hardware prefetches from the streaming threads count.
+- **System-wide,** the top points imply 100-164 lines in flight. This is
+  consistent with the ~12 above:
+  - **~12 is per core, demand misses only.** A random chase cannot be
+    prefetched, so only demand-miss slots are used.
+  - **100-164 is system-wide over 4 cores, and includes hardware
+    prefetches,** which streaming threads generate in large numbers. Per core
+    that is up to ~41.
+  - Direct check: one core's *sequential* read alone keeps 19.5 GB/s x
+    113.8 ns / 64 B = **~35 lines** in flight, about 3x the demand limit.
+  - So the extra concurrency comes from prefetches, not from more demand
+    slots. Using the probe's latency as R for every request is a further
+    approximation (streamed lines may wait less or more than the probe).
 - **Approximation:** R is the probe's latency, not the mean over all
   requests. VTune measured 20.7 GB/s average (23.1 max) at the 3-thread top
   point vs our 22.0 GB/s estimate, so the bandwidth axis is confirmed within
@@ -175,9 +185,21 @@ in every DRAM run (0.125 / 0.1875 expected).
 | L2 lines in (`L2_LINES_IN.ALL`) | 0.830 | 0.918 |
 | demand L3 misses (`MEM_LOAD_RETIRED.L3_MISS`) | 0.753 | 0.882 |
 
-Counter choice matters. Prefetching hides about half of the DRAM lines from
-the demand-miss counter (saxpy at 32M: 0.068 demand misses vs 0.126 lines
-per element), so it correlates worst with runtime.
+**Statistical check.** n = 16 runs, clustered by cache level, and the two
+kernels share sizes, so the effective sample is smaller.
+- All three correlations are significant: permutation p < 0.001 (10,000
+  permutations).
+- The bootstrap 95% CIs are wide: LLC 0.58-0.99, L2 lines in 0.66-0.98,
+  demand 0.52-0.92.
+- **The LLC-vs-demand difference is NOT statistically significant:**
+  bootstrap 95% CI of the difference is [-0.035, 0.362], so correlation
+  alone does not prove the broader counter explains runtime better.
+
+**The real evidence that counter choice matters is the line count.**
+Prefetching hides about half of the DRAM lines from the demand-miss counter
+(saxpy at 32M: 0.068 demand misses vs 0.126 lines per element), while
+`L2_LINES_IN.ALL` matches the true line traffic within 1.2%. A demand-miss
+count therefore understates memory traffic by ~2x for streaming code.
 
 **AMAT.**
 - Method: measured per-level hit fractions (VTune) x per-level latencies,
@@ -188,6 +210,13 @@ per element), so it correlates worst with runtime.
 | size | 64K | 256K | 1M | 2M | 8M | 16M | 64M |
 |---|---|---|---|---|---|---|---|
 | AMAT error % | -0.5 | 0.0 | +9.8 | -5.2 | +7.3 | -7.3 | -5.5 |
+
+- **Calibration vs test.** Calibration uses 16 KB (t_L1), 128 KB (t_L2), and
+  4 MB + 256 MB (pure t_L3, t_DRAM). The TLB term comes from the separate
+  page-mode sweep. None of the 7 test sizes was used for calibration.
+  64 KB and 256 KB are almost pure L2, so they are near-trivial tests. The
+  meaningful out-of-sample tests are 1-64 MB, where levels mix: errors there
+  are 5-10%.
 
 **TLB.** Page mode touches one line per 4 KB page. The control touches the
 same number of lines packed into a few pages.
@@ -247,8 +276,8 @@ AI use, and what was independently checked, corrected or rejected:
 |---|---|---|---|
 | H1 | L1 5, L2 13-16, L3 40-70 cyc, DRAM 85-110 ns | 5.0 / 14.1 / 40 pure (51 with TLB) / 82.5 ns pure, 105-116 with TLB | holds; DRAM above range only through TLB cost |
 | H2 | seq 1T ~20, 4T 22-24 GB/s; writes ~half; random 7-8 GB/s/thread | 19.5 / 23.1; writes 0.46x; random 4.3 | mostly holds; random lower (page walk per access) |
-| H3 | knee at 60-75% of peak; ~2-3x idle at saturation; ~31 lines; K plateau 10-12 | 72-84%; 2.5x (3 thr) to 4x (6 thr); 100-164 lines; plateau ~12 | knee slightly later; Little's Law count far higher (prefetches) |
-| H4 | runtime tracks LLC misses (r > 0.9); demand misses undercount | r 0.978 with LLC misses; demand counter 0.753, sees ~54% of lines | holds |
+| H3 | knee at 60-75% of peak; ~2-3x idle at saturation; ~31 lines; K plateau 10-12 | 72-84%; 2.5x (3 thr) to 4x (6 thr); 100-164 lines system-wide; per-core demand plateau ~12 | knee slightly later; system-wide count far higher because prefetches count (consistent with the per-core ~12) |
+| H4 | runtime tracks LLC misses (r > 0.9); demand misses undercount | r 0.978 / rho 0.956 (p < 0.001, CI 0.58-0.99); demand counter sees ~54% of lines | holds; LLC-vs-demand correlation difference not significant (n = 16) |
 | H5 | AMAT within 15% | within 10% out-of-sample | holds |
 | H6 | steps at 64 (+~7 cyc) and ~2048 pages (+20-40 cyc) | +7.1 cyc at 96 pages; +35-37 cyc at 3072-8192 | holds; huge pages untested |
 | H7 | seq-chase under-reports >= 10x; unpinned noisier | 26x; unpinned NOT noisier | first holds, second does not |

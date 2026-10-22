@@ -142,6 +142,16 @@ Correlation with ns/elem over all 16 runs:
 | LLC misses (incl. prefetch) / elem | 0.978 | 0.956 |
 | demand L3 misses / elem | 0.753 | 0.882 |
 
+Statistical check (n = 16; 10000 permutations / bootstrap resamples, seed 4320). Points are clustered by cache level and the two kernels share sizes, so the effective sample is smaller than 16 and the CIs are the honest measure:
+
+| counter | Spearman rho | permutation p | bootstrap 95% CI low | high |
+|---|---|---|---|---|
+| L2 lines in | 0.918 | < 0.001 | 0.662 | 0.979 |
+| LLC misses | 0.956 | < 0.001 | 0.576 | 0.994 |
+| demand L3 misses | 0.882 | < 0.001 | 0.515 | 0.921 |
+
+rho(LLC misses) - rho(demand L3 misses): bootstrap 95% CI [-0.035, 0.362], fraction of resamples <= 0: 0.090.
+
 ## 7. AMAT reconstruction
 
 AMAT = sum(f_level x t_level) + TLB(size). f = share of each MEM_LOAD_RETIRED bucket (L1/L2/L3 hit, L3 miss) in the timed loop. t_L1 1.36 ns (16 KB) and t_L2 3.83 ns (128 KB) from the zero-queue table; TLB(size) = page-mode minus control from section 2 (log-interpolated). Pure t_L3 10.99 ns and t_DRAM 82.5 ns solved from the 4 MB and 256 MB calibration points. Every other size is an out-of-sample prediction. Target (H5): within 15%.
