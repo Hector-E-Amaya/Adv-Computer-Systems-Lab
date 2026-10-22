@@ -44,10 +44,57 @@
   - 1 MiB sequential writes 136-170 MB/s on new AND existing files (so
     NTFS file extension is NOT the cause, tested);
   - the bandwidth log shows 245 -> 73 MB/s within 4 s.
-- **BitLocker / Device Encryption ON** (BitLockerProtection = 1). Software
-  encryption on the CPU caps the whole path (reads ~0.7 GB/s vs the drive's
-  ~3 GB/s).
-- 200 ms write tails suggest more than encryption cost: device write cache
-  policy and/or thermal state. The read-only admin diagnostic
-  (scripts/diag_admin.sh) collects the cache policy, BitLocker method and
-  SMART temperature/wear before the sweeps run.
+- **BitLocker / Device Encryption ON** (BitLockerProtection = 1).
+  ~~"Software encryption caps the whole path"~~: **retracted.** That was
+  stated without evidence (student concern 25). The tests below show reads
+  are NOT CPU/encryption-bound.
+
+### Investigation (student concerns 25-27), using existing data + read-only tests (no extra writes)
+- **Writes: the 200 ms is not a lone outlier.**
+  - 128 KiB seq writes at QD16: p50 35 ms, p99 202 ms.
+  - 1 MiB writes at QD8: p50 31-50 ms, p99 139-209 ms.
+  - 4 KiB random writes: p50 0.10 ms, p99 ~7 ms, p99.9 up to 279 ms.
+  - **At QD1, writes are fast:** 4 KiB 50 us; one 128 KiB write 0.37 ms
+    (p50); the max is 22-34 ms.
+  - **Every write pattern converges on ~140-170 MB/s** (4K random QD16
+    141 MB/s; 1 MiB seq 136-170 MB/s). Little's Law predicts the latency:
+    16 x 128 KiB / 150 MB/s = ~14 ms vs measured p50 13-35 ms.
+  - So the tails are queueing behind a **sustained write-throughput cap**.
+    Fast QD1 writes argue against a disabled write cache or slow encryption.
+    The drive buffers writes quickly but drains at ~150 MB/s (SLC-cache
+    state or thermal: unverified).
+- **Reads: not CPU-bound** (read-only scaling test, data/raw/investigate).
+  - 1 MiB seq read, (jobs, depth) from (1,1) to (4,8): **flat 618-766
+    MB/s**.
+  - Total CPU only **8-14%** of 8 logical CPUs (~1 core); latency grows
+    linearly with QD.
+  - OS disk counters match fio within a few %.
+  - Encryption/CPU would scale with threads and raise CPU. The ceiling is
+    the **device or link**. ~750 MB/s usable fits a ~1 GB/s link (e.g. a
+    down-trained PCIe link, x1 or lower generation, power saving).
+  - **Unverified:** link width/speed is not exposed through the Intel VMD
+    driver (DEVPKEY_PciDevice_* empty).
+- **Pitfall made like-for-like** (same 256 MiB file, 4 KiB random read,
+  QD1):
+
+  | variant | IOPS | mean |
+  |---|---|---|
+  | direct windowsaio | 7,864 | 126 us |
+  | buffered psync COLD | 10,680 | 93 us |
+  | buffered psync WARM | 189,411 | 5.1 us |
+  | buffered windowsaio WARM | 62,708 | 15.5 us |
+
+  - The same engine, cold vs warm, gives a **24x** difference: the page
+    cache, not the engine.
+  - **Correction:** windowsaio buffered reads DO hit the cache once the file
+    is cached. Earlier, the windowsaio warming pass did not populate the
+    cache; psync's did.
+  - Direct QD1 was 126 us here vs 220 us earlier on the same file: session
+    variation, hence 3 reps.
+- **Wear policy** (student: don't increase write volume aggressively;
+  system SSD).
+  - The SLC test is cut from 128 GiB to 16 GiB: the 1 s bandwidth log
+    already shows the drop within seconds.
+  - The steady random-write run is cut from 300 s to 120 s; write-side sweep
+    runs are cut to 8 s.
+  - Planned total host writes ~60-80 GB, tracked from fio's io_bytes.

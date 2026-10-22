@@ -23,5 +23,7 @@ Rules, enforced by the scripts (Batch 1 adds checks for each):
 6. **Cleanup** of `C:\fio-test\` is done only on the student's
    instruction, and the files are disposable by definition.
 
-Wear: the expected total host writes are a few hundred GB. The drive's
-endurance rating is roughly 300 TBW, so this is negligible.
+Wear: the planned total host writes are ~60-80 GB, against an endurance
+rating of roughly 300 TBW. Write volume was deliberately reduced after
+Batch 1 (student request; NOTES "wear policy"): SLC test 16 GiB, write-side
+sweep runs 8 s, steady-state run 120 s.
