@@ -186,6 +186,32 @@ means the report has numbers.
   t_start/t_end so disturbed points can be flagged. The first typeperf
   sample is blank: the analysis skips it.
 
+### Full sweep run 1 (2026-10-22 00:58-01:20): rejected for interference, kept as pitfall evidence
+- Completed: 936 rows (ws 210, tlb 108, mlp 30, pin 30, bwws 96, bw 264,
+  knee 198), 0 invalid, exit 0. Large pages skipped (privilege not granted).
+- `scripts/check_interference.py` (the pre-declared METHODS rule: a non-benchmark
+  CPU > 25% busy during the row) flagged **283/936 rows (30%)**.
+- **The flags are meaningful.** Flagged vs unflagged repetitions of the same
+  configuration (median ratio over configurations):
+  - ws latency: min +6.4%, median **+12.8%** (p90 +46%);
+  - mlp latency: +15-18%;
+  - bwws bandwidth: **-12%**; bw bandwidth: -3.3%;
+  - knee: latency +3.9%, DRAM GB/s -3.8%.
+  The effect always goes the direction interference predicts, and exceeds the
+  normal rep-to-rep spread (e.g. bwws 2.5%).
+- **Source: bursts, not the setup.** Minutes 01:06, 01:07 and 01:10 had zero
+  flags. Bursts line up with launching the run, the two status checks the
+  student requested (01:02-01:03, 01:14-01:15; Claude app rendering replies
+  plus the checks themselves) and other activity (likely light document
+  editing).
+- Decision: archive as `data/raw/run1_interfered/` (benchmark-pitfall
+  evidence: background activity measurably biases memory benchmarks, and is
+  detected by a CPU logger). Then re-run the full sweeps with the machine
+  quiet (no Edge, no status checks), re-flag, and re-measure only rows still
+  flagged.
+- `check_interference.py --dir data/raw/run1_interfered` reproduces the
+  flagging byte-for-byte.
+
 ### Correctness suite (`scripts/test.sh`, now 366 checks, all pass)
 - lat single-cycle check: random/seq/page modes, 128 B .. 256 MB.
 - **Mutation:** `lat_mutant` (Fisher-Yates instead of Sattolo, which can

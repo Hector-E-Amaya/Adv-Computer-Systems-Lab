@@ -1,0 +1,23 @@
+sweeps: ws tlb mlp pin bwws bw knee (REPS=3 QUICK=0) started 00:58:14
+CPU logger running -> data/raw/cpu_log.csv
+== ws -> data/raw/sweep_ws.csv (00:58:16)
+   rep 1 done (00:59:06)
+   rep 2 done (00:59:55)
+   rep 3 done (01:00:47)
+== tlb -> data/raw/sweep_tlb.csv (01:00:47)
+   rep 1 done (01:01:08)
+   rep 2 done (01:01:28)
+   rep 3 done (01:01:49)
+   large pages unavailable (SeLockMemoryPrivilege not granted): 4 KB pages only
+== mlp -> data/raw/sweep_mlp.csv (01:01:49)
+== pin -> data/raw/sweep_pin.csv (01:02:47)
+== bwws -> data/raw/sweep_bwws.csv (01:03:44)
+== bw -> data/raw/sweep_bw.csv (01:06:44)
+   rep 1 done (01:09:34)
+   rep 2 done (01:12:23)
+   rep 3 done (01:15:12)
+== knee -> data/raw/sweep_knee.csv (01:15:12)
+   rep 1 done (01:16:51)
+   rep 2 done (01:18:30)
+   rep 3 done (01:20:07)
+finished 01:20:08; invalid rows: 0
