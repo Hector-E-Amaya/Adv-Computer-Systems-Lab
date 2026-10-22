@@ -4,6 +4,10 @@ Manual notes (not detectable by script):
   Intel RST/VMD (BusType "RAID"). Single usable partition C: (system drive).
 - Target: disposable files in C:\fio-test\ only, direct I/O (reports/SAFETY.md).
 - Windows power slider "Best performance", AC power, machine idle during runs.
-- SMART / temperature need administrator rights (optional admin snapshot).
+- SMART / temperature need administrator rights (scripts/diag_admin.sh).
+- BitLocker / Device Encryption is ON for C: (BitLockerProtection = 1, read
+  without admin 2026-10-22). The PM991a has no hardware encryption, so every
+  I/O is encrypted/decrypted in software. All results characterize the full
+  stack: NTFS + BitLocker + Intel RST/VMD + SSD.
 - fio: official Windows build from github.com/axboe/fio/releases, installed
   by the student.

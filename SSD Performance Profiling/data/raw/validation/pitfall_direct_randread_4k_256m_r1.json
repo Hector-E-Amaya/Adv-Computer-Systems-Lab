@@ -1,0 +1,284 @@
+{
+ "fio version": "fio-3.43",
+ "timestamp": 1792670806,
+ "timestamp_ms": 1792670806241,
+ "time": "Thu Oct 22 08:06:46 2026",
+ "global options": {
+  "ioengine": "windowsaio",
+  "direct": "1",
+  "thread": "1",
+  "time_based": "1",
+  "runtime": "4",
+  "ramp_time": "1",
+  "randrepeat": "0",
+  "norandommap": "1",
+  "refill_buffers": "1",
+  "buffer_compress_percentage": "0",
+  "lat_percentiles": "1",
+  "percentile_list": "50:90:95:99:99.9:99.99",
+  "group_reporting": "1",
+  "bs": "4k",
+  "size": "268435456",
+  "rw": "randread",
+  "iodepth": "1",
+  "filename": "C\\:\\fio-test\\val_256m.dat"
+ },
+ "jobs": [
+  {
+   "jobname": "pitfall_direct_randread_4k_256m",
+   "groupid": 0,
+   "job_start": 1792670801945,
+   "error": 0,
+   "eta": 0,
+   "elapsed": 5,
+   "read": {
+    "io_bytes": 74027008,
+    "io_kbytes": 72292,
+    "bw_bytes": 18502126,
+    "bw": 18068,
+    "iops": 4516.870782,
+    "runtime": 4001,
+    "total_ios": 18072,
+    "short_ios": 0,
+    "drop_ios": 0,
+    "slat_ns": {
+     "min": 8152,
+     "max": 944683,
+     "mean": 18505.629226,
+     "stddev": 17461.881784,
+     "N": 18073
+    },
+    "clat_ns": {
+     "min": 1277,
+     "max": 68433131,
+     "mean": 201369.410635,
+     "stddev": 1241539.630881,
+     "N": 18072,
+     "percentile": {
+      "50.000000": 136192,
+      "90.000000": 201728,
+      "95.000000": 230400,
+      "99.000000": 419840,
+      "99.900000": 18743296,
+      "99.990000": 67633152
+     }
+    },
+    "lat_ns": {
+     "min": 101019,
+     "max": 68499199,
+     "mean": 219873.076859,
+     "stddev": 1243053.419802,
+     "N": 18072,
+     "percentile": {
+      "50.000000": 152576,
+      "90.000000": 230400,
+      "95.000000": 264192,
+      "99.000000": 468992,
+      "99.900000": 19005440,
+      "99.990000": 67633152
+     }
+    },
+    "bw_min": 2792,
+    "bw_max": 24672,
+    "bw_agg": 99.004579,
+    "bw_mean": 17888.625,
+    "bw_dev": 7717.247824,
+    "bw_samples": 8,
+    "iops_min": 698,
+    "iops_max": 6168,
+    "iops_mean": 4472.125,
+    "iops_stddev": 1929.283097,
+    "iops_samples": 8
+   },
+   "write": {
+    "io_bytes": 0,
+    "io_kbytes": 0,
+    "bw_bytes": 0,
+    "bw": 0,
+    "iops": 0.0,
+    "runtime": 0,
+    "total_ios": 0,
+    "short_ios": 0,
+    "drop_ios": 0,
+    "slat_ns": {
+     "min": 0,
+     "max": 0,
+     "mean": 0.0,
+     "stddev": 0.0,
+     "N": 0
+    },
+    "clat_ns": {
+     "min": 0,
+     "max": 0,
+     "mean": 0.0,
+     "stddev": 0.0,
+     "N": 0
+    },
+    "lat_ns": {
+     "min": 0,
+     "max": 0,
+     "mean": 0.0,
+     "stddev": 0.0,
+     "N": 0
+    },
+    "bw_min": 0,
+    "bw_max": 0,
+    "bw_agg": 0.0,
+    "bw_mean": 0.0,
+    "bw_dev": 0.0,
+    "bw_samples": 0,
+    "iops_min": 0,
+    "iops_max": 0,
+    "iops_mean": 0.0,
+    "iops_stddev": 0.0,
+    "iops_samples": 0
+   },
+   "trim": {
+    "io_bytes": 0,
+    "io_kbytes": 0,
+    "bw_bytes": 0,
+    "bw": 0,
+    "iops": 0.0,
+    "runtime": 0,
+    "total_ios": 0,
+    "short_ios": 0,
+    "drop_ios": 0,
+    "slat_ns": {
+     "min": 0,
+     "max": 0,
+     "mean": 0.0,
+     "stddev": 0.0,
+     "N": 0
+    },
+    "clat_ns": {
+     "min": 0,
+     "max": 0,
+     "mean": 0.0,
+     "stddev": 0.0,
+     "N": 0
+    },
+    "lat_ns": {
+     "min": 0,
+     "max": 0,
+     "mean": 0.0,
+     "stddev": 0.0,
+     "N": 0
+    },
+    "bw_min": 0,
+    "bw_max": 0,
+    "bw_agg": 0.0,
+    "bw_mean": 0.0,
+    "bw_dev": 0.0,
+    "bw_samples": 0,
+    "iops_min": 0,
+    "iops_max": 0,
+    "iops_mean": 0.0,
+    "iops_stddev": 0.0,
+    "iops_samples": 0
+   },
+   "sync": {
+    "total_ios": 0,
+    "lat_ns": {
+     "min": 0,
+     "max": 0,
+     "mean": 0.0,
+     "stddev": 0.0,
+     "N": 0
+    }
+   },
+   "job_runtime": 4000,
+   "usr_cpu": 0.0,
+   "sys_cpu": 0.0,
+   "ctx": 0,
+   "majf": 0,
+   "minf": 0,
+   "iodepth_level": {
+    "1": 100.0,
+    "2": 0.0,
+    "4": 0.0,
+    "8": 0.0,
+    "16": 0.0,
+    "32": 0.0,
+    ">=64": 0.0
+   },
+   "iodepth_submit": {
+    "0": 0.0,
+    "4": 100.0,
+    "8": 0.0,
+    "16": 0.0,
+    "32": 0.0,
+    "64": 0.0,
+    ">=64": 0.0
+   },
+   "iodepth_complete": {
+    "0": 0.0,
+    "4": 100.0,
+    "8": 0.0,
+    "16": 0.0,
+    "32": 0.0,
+    "64": 0.0,
+    ">=64": 0.0
+   },
+   "latency_ns": {
+    "2": 0.0,
+    "4": 0.0,
+    "10": 0.0,
+    "20": 0.0,
+    "50": 0.0,
+    "100": 0.0,
+    "250": 0.0,
+    "500": 0.0,
+    "750": 0.0,
+    "1000": 0.0
+   },
+   "latency_us": {
+    "2": 0.01,
+    "4": 0.0,
+    "10": 0.01,
+    "20": 0.01,
+    "50": 0.011067,
+    "100": 0.132802,
+    "250": 96.281541,
+    "500": 2.678176,
+    "750": 0.149402,
+    "1000": 0.060868
+   },
+   "latency_ms": {
+    "2": 0.287738,
+    "4": 0.19367,
+    "10": 0.060868,
+    "20": 0.027667,
+    "50": 0.088535,
+    "100": 0.011067,
+    "250": 0.0,
+    "500": 0.0,
+    "750": 0.0,
+    "1000": 0.0,
+    "2000": 0.0,
+    ">=2000": 0.0
+   },
+   "latency_depth": 1,
+   "latency_target": 0,
+   "latency_target_ns": 0,
+   "latency_percentile": 100.0,
+   "latency_window": 0,
+   "latency_window_us": 0
+  }
+ ],
+ "_meta": {
+  "sweep": "validation",
+  "name": "pitfall_direct_randread_4k_256m",
+  "rep": 1,
+  "t_start": 1792670796.8120513,
+  "t_end": 1792670806.2571323,
+  "params": {
+   "filename": "C:\\fio-test\\val_256m.dat",
+   "size": 268435456,
+   "rw": "randread",
+   "bs": "4k",
+   "iodepth": 1,
+   "runtime": 4,
+   "ramp_time": 1
+  }
+ }
+}

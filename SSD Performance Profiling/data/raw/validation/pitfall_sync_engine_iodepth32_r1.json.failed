@@ -1,0 +1,1 @@
+fio: Windows does not support direct or non-buffered io with the synchronous ioengines. Use the 'windowsaio' ioengine with 'direct=1' and 'iodepth=1' instead.
