@@ -144,7 +144,49 @@ means the report has numbers.
   confirms identical machine code with and without -g for all 5 objects
   (8839 instructions).
 
-### Correctness suite (`scripts/test.sh`, now 363 checks, all pass)
+### Batch 2 scripts: correction gate (before any full sweep)
+- **loaded --smt** put the first sibling traffic thread on CPU 3, the chase
+  core's own SMT sibling: core-resource contention, not memory queueing.
+  The chase sibling is now last (used only by a 7th thread; sweeps stop at
+  6). Regression test: 6 threads -> "4 6 0 5 7 1".
+- **loaded undercounted DRAM traffic for write mixes.** Regular stores move
+  each line twice (RFO + write-back). 3 threads at 100% writes: 7.3 GB/s of
+  lines = **14.7 GB/s DRAM**, at 508 ns. A new est_dram_gbps_med column uses
+  the bw model, validated by VTune within 2%. Regression tests: equal to
+  total at 0% writes; ~2x traffic + chase at 100%.
+- **bw is loop-bound in cache:** 16 KB and 1 MB both read ~83 GB/s (loop cap
+  ~1.3 G lines/s). bwws points below L3 are **lower bounds, not cache
+  bandwidth**. True L1/L2/L3 read bandwidth is taken from Project 1's
+  peak.c on the same laptop (429 / 157 / 51 GB/s). DRAM points unaffected.
+- **Quick sweep values reviewed:**
+  - L1 5.2 cycles; 1 MB 22 cycles (L2 + STLB);
+  - sequential-chase pitfall: 4.6 ns vs 120 ns random (26x under-report);
+  - TLB at 8192 pages +10 ns over control;
+  - knee 119 -> 295 ns at 21.7 GB/s;
+  - gran 8 vs 64: same line rate (H2).
+- **Per-process DRAM-latency variation (real finding).** Each run is a new
+  process with different physical pages. The idle `loaded` minimum ranged
+  112-137 ns across separate runs; min-over-trials is stable only within a
+  process. A one-process-each test check failed (1.13, 1.20) for this
+  reason, not because of preceding traffic (disproved: pairs right after
+  100%-write traffic agreed within 0.5%). Fixed the **estimator**, not the
+  threshold: 3 interleaved runs each, lowest minima, +-5% kept (now 1.031,
+  0.994). The sweeps' 3 repetitions are separate processes, so the analysis
+  reports spread across processes.
+- **run_counters.sh:**
+  - The timed function is located by address via `nm` (VTune showed
+    func@0x... in the smoke test); the name is accepted if VTune has it.
+  - Regexes are anchored (`^mul$` must not match `__muldc3`) and passed via
+    ENVIRON (awk -v turned `\.` into `.`).
+  - A leftover dead line was removed.
+  - Tested with a stand-in in 6 scenarios (addr / named PASS; wrong
+    function, missing event, failed collection FAIL; Ctrl+C ->
+    INTERRUPTED). Stand-in output was verified fake (36/36) and removed.
+- **CPU logger** (typeperf, per CPU, 1 s) runs during sweeps. Each row carries
+  t_start/t_end so disturbed points can be flagged. The first typeperf
+  sample is blank: the analysis skips it.
+
+### Correctness suite (`scripts/test.sh`, now 366 checks, all pass)
 - lat single-cycle check: random/seq/page modes, 128 B .. 256 MB.
 - **Mutation:** `lat_mutant` (Fisher-Yates instead of Sattolo, which can
   split into several cycles) fails the check at 64K/1M/16M as required.

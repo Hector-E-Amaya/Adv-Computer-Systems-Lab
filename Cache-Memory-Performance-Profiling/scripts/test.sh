@@ -106,6 +106,16 @@ for f in saxpy mul; do
         grep -cE 'v(fmadd[0-9]+|mul)ps.*ymm')
     [ "$n" -gt 0 ] && ok "asm: kern $f uses ymm packed math" || bad "asm: kern $f not vectorized"
 done
+# loaded --smt: traffic never shares the chase core (CPU 2/3) until all else is used
+lcpus=$(build/loaded.exe --threads 6 --smt --delay 0 --trials 1 --window 0.01 --chase-size 1M --traffic-size 1M | awk -F, '{print $NF}')
+[ "$lcpus" = "4 6 0 5 7 1" ] && ok "loaded --smt 6 traffic threads avoid the chase core ($lcpus)" \
+    || bad "loaded --smt cpus = '$lcpus', want '4 6 0 5 7 1'"
+# loaded DRAM estimate: read-only traffic -> equals total; 100% writes -> ~2x traffic + chase
+r0=$(build/loaded.exe --threads 1 --delay 0 --wpct 0 --trials 3 --window 0.02)
+in_range "loaded est_dram / total at 0% writes (exact)" "$(echo "$r0" | awk -F, '{print $12 / $11}')" 0.9999 1.0001
+r1=$(build/loaded.exe --threads 1 --delay 0 --wpct 100 --trials 5 --window 0.02)
+in_range "loaded est_dram / (2 x traffic + chase) at 100% writes" \
+    "$(echo "$r1" | awk -F, '{print $12 / (2 * $10 + 64 / $6)}')" 0.95 1.05
 # loaded: more delay must mean less traffic (the delay loop is not optimized away)
 fast=$(build/loaded.exe --threads 1 --delay 0 --trials 3 --window 0.02 | cut -d, -f10)
 slow=$(build/loaded.exe --threads 1 --delay 400 --trials 3 --window 0.02 | cut -d, -f10)
@@ -126,15 +136,29 @@ echo "[7] sanity vs known values (takes ~1 minute)"
 col() { cut -d, -f"$1"; }
 l1=$(build/lat.exe --size 16K --trials 7 | col 12)
 in_range "L1 latency, cycles (Willow Cove: 5)" "$l1" 4.5 6
-dram=$(build/lat.exe --size 256M --trials 9 | col 10)
-in_range "DRAM latency (min), ns" "$dram" 60 200
-# Back-to-back with lat, before any bandwidth load: a heavy all-core run just
-# before was seen to raise idle latency ~7% (likely uncore clock state).
-idle=$(build/loaded.exe --threads 0 --trials 9 | col 7)
-in_range "loaded(idle) / lat latency, both min" "$(python -c "print($idle/$dram)")" 0.95 1.05
-k8=$(build/lat.exe --size 256M --k 8 --trials 9 | col 10)
-k1=$(build/lat.exe --size 256M --k 1 --trials 9 | col 10)
-in_range "K=8 / K=1 throughput from min latencies (MLP works; physical max 8)" \
+# Each run is a new process with different physical pages, and DRAM latency
+# varies between processes (seen: loaded idle 112-137 ns, lat 106-115 ns in
+# separate runs) even though the minimum over trials is stable within a run.
+# Comparing ONE process of each tool tests placement luck, not the tools, so
+# cross-tool checks interleave 3 runs of each and compare the lowest minima.
+lo() { python -c "import sys; print(min(map(float, sys.argv[1:])))" "$@"; }
+d=() i=() a=() b=()
+for r in 1 2 3; do
+    d+=("$(build/lat.exe --size 256M --trials 9 | col 10)")
+    i+=("$(build/loaded.exe --threads 0 --trials 9 | col 7)")
+done
+dram=$(lo "${d[@]}")
+idle=$(lo "${i[@]}")
+in_range "DRAM latency (lowest min of 3 runs), ns" "$dram" 60 200
+in_range "loaded(idle) / lat latency, lowest min of 3 interleaved runs each" \
+    "$(python -c "print($idle/$dram)")" 0.95 1.05
+for r in 1 2 3; do
+    a+=("$(build/lat.exe --size 256M --k 8 --trials 9 | col 10)")
+    b+=("$(build/lat.exe --size 256M --k 1 --trials 9 | col 10)")
+done
+k8=$(lo "${a[@]}")
+k1=$(lo "${b[@]}")
+in_range "K=8 / K=1 throughput, lowest min of 3 interleaved runs each (physical max 8)" \
     "$(python -c "print(8 * $k1 / $k8)")" 3 8
 bw1=$(build/bw.exe --size 256M --trials 5 | col 11)
 in_range "seq read, 1 thread, GB/s" "$bw1" 12 25.6

@@ -30,7 +30,7 @@ attributed accurately. Commit hashes point to the evidence.
 | 11 | `rm -rf` permanently deletes results | Valid | Replaced by timestamped result folders; nothing deleted (36f91e5) |
 | 12 | **Every script must be checked for bugs before continuing**, since bugs could skew results | Valid | Full review: 7 real bugs fixed with regression tests, one assistant finding retracted (4876bfb); line-ending and editing issues fixed (2a9339c) |
 | 13 | Accidental interruption of the admin run | Revealed a gap | Script now logs INTERRUPTED and exits 130 instead of ending with no verdict; tested (6a9e324) |
-| 14 | Can other work (Edge, slides/docs) run during sweeps? | Valid: it adds memory/CPU interference | Background CPU logger planned for Batch 2, to flag contaminated points |
+| 14 | Can other work (Edge, slides/docs) run during sweeps? | Valid: it adds memory/CPU interference | Implemented: typeperf per-CPU logger during sweeps, per-row timestamps, flag-and-rerun rule in METHODS.md (Batch 2) |
 
 ## Found by the assistant's own testing (for accurate attribution)
 - `bw` first version was CPU-bound (10 GB/s vs 20.8 GB/s expected); rewritten twice (352e811).

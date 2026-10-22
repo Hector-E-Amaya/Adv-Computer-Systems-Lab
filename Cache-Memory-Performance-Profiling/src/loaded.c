@@ -103,7 +103,8 @@ int main(int argc, char **argv)
         const char *a = argv[i], *v = i + 1 < argc ? argv[i + 1] : NULL;
         if (!strcmp(a, "--header")) {
             puts("tool,threads,delay,wpct,trials,lat_ns_med,lat_ns_min,lat_ns_max,lat_cyc_med,"
-                 "traffic_gbps_med,total_gbps_med,ghz_before,ghz_after,chase_cpu,traffic_cpus");
+                 "traffic_gbps_med,total_gbps_med,est_dram_gbps_med,ghz_before,ghz_after,chase_cpu,"
+                 "traffic_cpus");
             return 0;
         } else if (!strcmp(a, "--smt")) {
             smt = 1;
@@ -130,7 +131,9 @@ int main(int argc, char **argv)
     timer_init();
 
     /* Chase on core 1; traffic on cores 2, 3, 0 (core 0 last: OS interrupts).
-     * --smt adds the chase core's sibling and the other siblings. */
+     * --smt then adds the siblings of the traffic cores, and the chase core's
+     * own sibling LAST: a traffic thread sharing the chase core would measure
+     * core-resource contention, not memory queueing. */
     int cores[32], ncore = core_cpus(cores, 32), cpus[64], ncpu = 0; /* <= 32 cores fits cpus[64] */
     if (ncore < 1) {
         fprintf(stderr, "could not read the CPU topology\n");
@@ -139,9 +142,11 @@ int main(int argc, char **argv)
     int chase_cpu = cores[1 % ncore];
     for (int i = 2; i < ncore + 1; i++)
         cpus[ncpu++] = cores[i % ncore];
-    if (smt)
-        for (int i = 1; i < ncore + 1; i++)
+    if (smt) {
+        for (int i = 2; i < ncore + 1; i++)
             cpus[ncpu++] = cores[i % ncore] + 1;
+        cpus[ncpu++] = chase_cpu + 1;
+    }
     if (threads < 0 || threads > ncpu || wpct % 10 || wpct < 0 || wpct > 100 || trials < 1)
         usage();
     pin_thread(chase_cpu);
@@ -182,7 +187,7 @@ int main(int argc, char **argv)
         steps = (int64_t)(steps * (dt > 1e-6 ? 1.2 * window / dt : 16));
     }
     double *lat = malloc(trials * sizeof *lat), *tgb = malloc(trials * sizeof *tgb);
-    double *all = malloc(trials * sizeof *all);
+    double *all = malloc(trials * sizeof *all), *dram = malloc(trials * sizeof *dram);
     for (int r = 0; r < trials; r++) {
         int64_t before = 0, after = 0;
         for (int i = 0; i < threads; i++)
@@ -195,6 +200,10 @@ int main(int argc, char **argv)
         lat[r] = dt / steps * 1e9;
         tgb[r] = (double)(after - before) * LINE / dt / 1e9;
         all[r] = tgb[r] + LINE / lat[r]; /* + the chase's own line per hop */
+        /* DRAM traffic: a regular store's line is read (RFO) and written
+         * back, so written lines count twice (same model as bw.c, validated
+         * against VTune). Reads and the chase count once. */
+        dram[r] = tgb[r] * (1 + wpct / 100.0) + LINE / lat[r];
     }
     stop = 1;
     if (threads)
@@ -203,9 +212,9 @@ int main(int argc, char **argv)
     sink ^= (uintptr_t)p;
 
     double med = median(lat, trials);
-    printf("loaded,%d,%d,%d,%d,%.3f,%.3f,%.3f,%.1f,%.4f,%.4f,%.4f,%.4f,%d,", threads, delay, wpct,
-           trials, med, lat[0], lat[trials - 1], med * 0.5 * (ghz0 + ghz1), median(tgb, trials),
-           median(all, trials), ghz0, ghz1, chase_cpu);
+    printf("loaded,%d,%d,%d,%d,%.3f,%.3f,%.3f,%.1f,%.4f,%.4f,%.4f,%.4f,%.4f,%d,", threads, delay,
+           wpct, trials, med, lat[0], lat[trials - 1], med * 0.5 * (ghz0 + ghz1),
+           median(tgb, trials), median(all, trials), median(dram, trials), ghz0, ghz1, chase_cpu);
     for (int i = 0; i < threads; i++)
         printf("%s%d", i ? " " : "", cpus[i]);
     printf("\n");

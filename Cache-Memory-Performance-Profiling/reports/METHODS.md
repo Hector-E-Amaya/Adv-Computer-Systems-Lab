@@ -42,6 +42,18 @@ Fixed before Batch 2. Any deviation is recorded in `reports/NOTES.md`.
   **median and minimum**. Comparisons between separate runs (tests,
   control-minus-page differences) use the minimum.
 - **Bandwidth:** median of trials. Error bars as above.
+- **Per-process variation:** each repetition is a separate process, with
+  different physical pages. DRAM latency varies between processes beyond
+  within-run noise (Batch 2 gate: 112-137 ns idle). Results therefore report
+  the spread across the 3 repetitions. Cross-tool or cross-run comparisons
+  use the lowest minimum over several interleaved runs.
+- **Interference flagging:** `typeperf` logs % busy per logical CPU every
+  second during sweeps (`data/raw/cpu_log.csv`). A row is flagged when a CPU
+  not used by the benchmark averages > 25% busy during its t_start..t_end;
+  flagged rows are reported and re-run, not silently dropped.
+- **In-cache bandwidth:** `bw`'s general pattern loop caps at ~83 GB/s, so
+  its L1/L2 points are lower bounds. Cache bandwidth ceilings come from
+  Project 1's `peak.c` on the same machine.
 
 ## Derived quantities (definitions fixed in advance)
 - **Cycles:** ns x GHz, using the mean of the before/after measurement.
