@@ -244,7 +244,11 @@ means the report has numbers.
     predicted) and +9.4-10 ns after 2048 pages (~37 cyc walk, within H6's
     20-40); grows to +30 ns at 65536 pages;
   - **MLP:** linear to K=12 (5.68 GB/s), flat at 14-16 with per-chain
-    latency 150-172 ns (fill-buffer limit, H3);
+    latency 150-172 ns. **Corrected wording:** this is an *effective
+    concurrency limit of ~12 per core* (Little's Law at K=12: 5.68 GB/s x
+    134 ns / 64 B = 11.9 lines). It does NOT prove 12 fill buffers. Every
+    load in a random 256 MB chase also needs a page walk, so the page walkers
+    are an equally possible limit (student concern 17);
   - **knee:** flat ~114-125 ns until ~17-20 GB/s, then 282-451 ns at
     22-23 GB/s. **R/W mix** at 3 threads: w0 22.6 GB/s / 282 ns, w30 19.2 /
     392, w50 18.4 / 436, w100 18.7 / 497 (DRAM GB/s);
