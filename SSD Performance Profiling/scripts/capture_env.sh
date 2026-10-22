@@ -7,7 +7,9 @@
 # scripts/smart_snapshot.ps1.
 set -u
 
-psh() { powershell.exe -NoProfile -Command "$1" 2>/dev/null | tr -d '\r' | awk 'NF'; }
+# tr strips CR and NUL: PowerShell prints a NUL for partitions without a drive
+# letter, which made env.txt a binary file.
+psh() { powershell.exe -NoProfile -Command "$1" 2>/dev/null | tr -d '\r\000' | awk 'NF'; }
 ver() { if command -v "$1" >/dev/null 2>&1; then "$@" 2>&1 | head -1; else echo "$1: not found"; fi; }
 
 echo "== Date =="; date -u +"%Y-%m-%dT%H:%M:%SZ"
