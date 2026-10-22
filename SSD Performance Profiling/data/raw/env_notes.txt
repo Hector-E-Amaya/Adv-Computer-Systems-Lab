@@ -11,3 +11,4 @@ Manual notes (not detectable by script):
   stack: NTFS + BitLocker + Intel RST/VMD + SSD.
 - fio: official Windows build from github.com/axboe/fio/releases, installed
   by the student.
+- Full sweeps started 2026-10-22 08:34 EDT: Edge closed, student away, no status checks.

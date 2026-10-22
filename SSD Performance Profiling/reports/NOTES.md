@@ -99,6 +99,42 @@
     throttling stays a plausible but unproven cause of the ~150 MB/s
     sustained write cap). TemperatureMax not reported. Wear 0%.
   - Temperature during sweeps would need admin; not logged (limitation).
+### Full sweeps (2026-10-22 08:34-09:19), 0 failed runs
+- 205 runs: prep 1, qd1 12, bs 96, mix 12, qd 54, tail 12, state 2,
+  pitfall 15. Knees by the 90%-of-max-IOPS rule: randread QD32, randwrite
+  QD4. **Total host writes 113.8 GB** (fio io_bytes; budget 163).
+- QD1 (median of 3):
+  - 4K randread 139 us (p50 134, p99 216, p99.9 399), slat 10.5 us;
+  - 4K randwrite 69 us (p50 50, p99 136, p99.9 1810);
+  - 128K seq read 179 us (730 MB/s);
+  - 128K seq write mean 1316 us (p50 354, p99 30.5 ms).
+- QD sweep, randread: linear to QD32 (126K IOPS, 242 us), plateau
+  110-116K beyond with latency rising linearly. Effective QD (Little's Law)
+  equals requested up to 32, then 51/95/176 at 64/128/256 (per-thread
+  submission limit). Randwrite: 15-31K IOPS at all QDs (write cap),
+  latency proportional to QD.
+- Block size: reads saturate ~700-745 MB/s from 64 KiB; writes ~90-100 MB/s
+  at every size from 16 KiB.
+- Mix (4K, QD16): 84.4K / 46.8K / 24.8K / 21.3K IOPS for 100/70/50/0%
+  reads; read p99 293 us -> 1.9 ms -> 4.1 ms as writes are added.
+- Tail: randread p99.9/p50 = 9x (QD16), 16x (QD32 knee); randwrite QD16
+  p99.9 30.5 ms vs p50 112 us (272x).
+- State: the 16 GiB seq write peaked at 183 MB/s in second 1, median 133,
+  min 42 MB/s over 133 s. **No SLC burst observable**: the ~130 MB/s cap
+  holds from the first second (H7 burst-then-drop not seen). Steady 4K
+  randwrite 126 MB/s.
+- **Pitfall run 1 (kept as data/raw/pitfall_run1):**
+  - rep 2 overlapped the student's status message and the assistant's
+    check (09:17): all runs degraded;
+  - rep 3: the warm pass read at 989 MB/s (from disk, not cache) and the
+    buffered reads then missed the cache (2.5K IOPS, slower than direct).
+- **Pitfall re-run (read-only, quiet):** buffered 177K / 54K / 169K IOPS vs
+  direct 8.0K / 7.3K / 5.3K. The warm pass was cached every time (~5 GB/s).
+  Buffered results swing 3x with OS cache state; direct stays steady. Median
+  gap ~23x.
+- run_sweeps.py printed nothing to the log until exit (Python output
+  buffering when redirected): use `python -u` for live logs.
+
 - **Wear policy** (student: don't increase write volume aggressively;
   system SSD).
   - SLC test 16 GiB (was 128); main test file 16 GiB (was 32: still far
