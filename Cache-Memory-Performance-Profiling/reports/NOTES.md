@@ -108,7 +108,43 @@ Tooling/line-ending issues (no measurement impact):
   up front that finalizing takes minutes. Tested with a hanging stand-in
   interrupted like Ctrl+C. The stand-in's output was removed afterwards.
 
-### Correctness suite (`scripts/test.sh`, now 361 checks, all pass)
+### VTune smoke test, completed (2026-10-21 20:24): ALL CHECKS PASSED
+Counter values were then validated against first principles. A PASS only
+means the report has numbers.
+- **SAXPY** (16M elements x 271 passes = 4.547e9 elements, DRAM):
+  - per-function INST_RETIRED in the saxpy loop = 3,412,005,118 vs
+    0.75/element x 4.547e9 = 3,409,900,000 (**0.06%**; loop = 6 instructions
+    per 8 floats);
+  - measure_ghz = 300,000,450 vs 2x3x5M x 10 = 300,000,000 (exact);
+  - L2_LINES_IN.ALL in saxpy = 574.8M vs 271 x 2,097,152 lines = 568.3M
+    (+1.2%), so it counts DRAM line traffic;
+  - MEM_LOAD_RETIRED.L3_MISS = 307M = only ~54% of lines (prefetch hides the
+    rest), the H4 caveat confirmed;
+  - DRAM: VTune 17.1 GB/s average (19.3 max) vs bw 16.8 GB/s, within 2%;
+    validates bw's accounting for reads.
+- **Sampling precision:** event counts are samples x sample-after value
+  (e.g. DTLB walks in saxpy = 4 samples x 100003), so each count is exact
+  only to about +-1 SAV. Rare events need a lower SAV in run_counters.sh.
+- **Page mode (8192 pages):** ~0.95 DTLB walks per load (beyond STLB reach),
+  as expected. **But 25% of loads went to DRAM and latency was 43 ns for a
+  512 KB data footprint: a real bug.**
+  - The (7*i mod 64) slot and the frame bits used only 64 of 1024 L2 sets:
+    the user's H6 "cache-set conflicts" concern, which I had wrongly
+    dismissed.
+  - A random-hash slot fixed L2 but unbalanced L1 slightly (512 pages
+    3.55 vs 3.29 ns), so it was replaced by the exact formula
+    (i + 7*(i/64)) mod 64.
+  - Old vs fixed, back to back: 256/512 pages equal (3.27); 8192: 26.7 ->
+    14.6 ns; 32768: 41.6 -> 27.6 ns. The old layout's error also varied
+    between runs (26.7 vs 44.5 ns at 8192 pages), since it depended on
+    physical page placement: irreproducible, not just wrong.
+  - Regression: `lat --check` verifies the set balance. The old layout is
+    built as `lat_slotmutant` and must fail.
+- **Debug symbols:** `-g` added so VTune shows function names. objdump
+  confirms identical machine code with and without -g for all 5 objects
+  (8839 instructions).
+
+### Correctness suite (`scripts/test.sh`, now 363 checks, all pass)
 - lat single-cycle check: random/seq/page modes, 128 B .. 256 MB.
 - **Mutation:** `lat_mutant` (Fisher-Yates instead of Sattolo, which can
   split into several cycles) fails the check at 64K/1M/16M as required.

@@ -13,7 +13,7 @@ ECSE 4320/6320 Advanced Computer Systems, class-wide project.
 ```bash
 scripts/capture_env.sh > data/raw/env.txt   # hardware / OS / memory / VBS / tools
 scripts/build.sh                            # build/{lat,bw,loaded,kern}.exe + asm
-scripts/test.sh                             # 361 correctness, regression + sanity checks
+scripts/test.sh                             # 363 correctness, regression + sanity checks
 ```
 
 ## Platform

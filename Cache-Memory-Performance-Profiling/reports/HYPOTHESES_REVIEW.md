@@ -73,6 +73,17 @@ prediction does and does not test.
    line offset (7 x page index) mod 64. 7 is coprime with 64, so nodes cycle
    through all 64 L1 sets. L2 (physically indexed) and L3 (hashed) spread them
    further.
+   **CORRECTION (VTune smoke test, still before any sweep): the statement
+   above was wrong.**
+   - The L2 set index uses address bits 6-15: the slot plus the low 4
+     page-frame bits. With consecutive frames, both depended only on
+     (page index mod 64), so nodes used **64 of 1024 L2 sets**.
+   - VTune showed 25% of page-mode loads going to DRAM for a 512 KB data
+     footprint. Latency at 8192 pages was 26.7-44.5 ns, against 14.6 ns after
+     the fix.
+   - Fixed with slot = (i + 7*(i/64)) mod 64: exact L1 balance per 64 pages,
+     all 1024 L2 (slot, frame) pairs per 1024 pages. Checked by
+     `lat --check`, with the old layout kept as a failing mutant.
 2. **Data-cache confound (new control).** In page mode the data footprint is
    one line per page. It outgrows L1 (48 KB = 768 lines) at about **768
    pages**, between the two predicted TLB steps (64 and ~2048). A step there

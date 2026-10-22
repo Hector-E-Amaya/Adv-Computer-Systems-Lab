@@ -43,7 +43,7 @@ in_range() {
     fi
 }
 
-for t in lat bw loaded kern lat_mutant; do
+for t in lat bw loaded kern lat_mutant lat_slotmutant; do
     [ -x build/$t.exe ] || { echo "missing build/$t.exe (run scripts/build.sh)"; exit 1; }
 done
 
@@ -62,6 +62,8 @@ for s in 8K 64K 1M 8M 32M; do expect_exit 0 build/lat.exe --size $s --mode page 
 
 echo "[3] mutation: broken cycle builder must FAIL the check"
 for s in 64K 1M 16M; do expect_exit 1 build/lat_mutant.exe --size $s --check; done
+echo "[3b] mutation: the old page layout (64 of 1024 L2 sets) must FAIL set-balance"
+for s in 8M 32M; do expect_exit 1 build/lat_slotmutant.exe --size $s --mode page --check; done
 
 echo "[4] bw coverage / checksum / write checks"
 for p in "seq" "stride --stride 64" "stride --stride 256" "stride --stride 1024" "random"; do

@@ -9,8 +9,9 @@
  *   random  one node per 64 B line, random cycle   -> true latency per level
  *   seq     node i -> i+1                          -> prefetcher-friendly (pitfall demo)
  *   page    one node per 4 KB page, random cycle; the node's line offset within
- *           the page varies so nodes spread over cache sets. The data stays
- *           small while the page count (TLB pressure) grows.
+ *           the page is hashed from the page index so nodes spread over all L1
+ *           and L2 sets. The data stays small while the page count (TLB
+ *           pressure) grows.
  *
  * --k K runs K independent chases along the same cycle (memory-level
  * parallelism); the output reports per-chase latency and total throughput.
@@ -34,10 +35,50 @@ static char *base;
 static size_t nnodes;
 static volatile uintptr_t sink;
 
+/* Page mode: line slot of the node within page i.
+ * L1 set = address bits 6-11 = slot. L2 set = bits 6-15 = (slot, low 4 bits
+ * of the page frame; i mod 16 for consecutive frames).
+ * The first version, slot = 7*i mod 64, made slot and i mod 16 both functions
+ * of i mod 64, so all nodes fell into only 64 of the 1024 L2 sets: conflict
+ * misses that looked like TLB cost (8192 pages: 44.5 ns vs 14.9 ns fixed).
+ * slot = (i + 7*(i/64)) mod 64 is a permutation of 0..63 within every 64
+ * consecutive pages (equal L1 sets), and (slot, i mod 16) takes all 1024
+ * values once per 1024 pages (equal L2 sets): equal pairs would need
+ * 7*db = 16t (mod 64), i.e. db a multiple of 16. Checked by --check. */
+static unsigned page_slot(size_t i)
+{
+#ifdef MUTANT_OLD_SLOT
+    return (unsigned)((i * 7) & 63); /* the original, L2-conflicting layout (test only) */
+#else
+    return (unsigned)((i + 7 * (i >> 6)) & 63);
+#endif
+}
+
+/* --check helper: L1 slots balanced per 64 pages, all 1024 (slot, i mod 16)
+ * pairs used exactly once per 1024 pages. */
+static int check_page_slots(void)
+{
+    for (size_t b = 0; b + 64 <= nnodes; b += 64) {
+        uint64_t seen = 0;
+        for (size_t i = b; i < b + 64; i++)
+            seen |= (uint64_t)1 << page_slot(i);
+        if (seen != ~(uint64_t)0)
+            return 0;
+    }
+    for (size_t b = 0; b + 1024 <= nnodes; b += 1024) {
+        static uint8_t pair[1024];
+        memset(pair, 0, sizeof pair);
+        for (size_t i = b; i < b + 1024; i++)
+            if (pair[page_slot(i) * 16 + (i & 15)]++)
+                return 0;
+    }
+    return 1;
+}
+
 static char *node_addr(size_t i, int mode)
 {
     if (mode == M_PAGE)
-        return base + i * PAGE4K + ((i * 7) & 63) * LINE;
+        return base + i * PAGE4K + (size_t)page_slot(i) * LINE;
     return base + i * LINE;
 }
 
@@ -210,10 +251,14 @@ int main(int argc, char **argv)
         for (int64_t i = 0; i < 2 * s; i++)
             walk = *(char **)walk;
         int cont = pos[0] == walk;
-        printf("%s lat mode=%s size=%zu nodes=%zu pages=%s single-cycle=%s continuation=%s\n",
-               ok && cont ? "PASS" : "FAIL", mode_name[o.mode], o.size, nnodes,
-               o.large ? "2M" : "4K", ok ? "ok" : "BAD", cont ? "ok" : "BAD");
-        return ok && cont ? 0 : 1;
+        int sets = o.mode != M_PAGE || check_page_slots();
+        int all = ok && cont && sets;
+        printf("%s lat mode=%s size=%zu nodes=%zu pages=%s single-cycle=%s continuation=%s "
+               "set-balance=%s\n",
+               all ? "PASS" : "FAIL", mode_name[o.mode], o.size, nnodes, o.large ? "2M" : "4K",
+               ok ? "ok" : "BAD", cont ? "ok" : "BAD",
+               o.mode != M_PAGE ? "n/a" : sets ? "ok" : "BAD");
+        return all ? 0 : 1;
     }
 
     /* Warm-up: one full lap (capped) loads caches and TLBs to steady state.
