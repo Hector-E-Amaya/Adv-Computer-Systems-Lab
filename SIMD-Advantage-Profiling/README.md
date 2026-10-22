@@ -24,7 +24,7 @@ scripts/run_sweeps.sh all               # ~35 min, keep on AC power; data/raw/sw
 python scripts/analyze.py               # plots/*.png, data/processed/*, reports/RESULTS_TABLES.md
 ```
 
-## Rubric map
+## Rubric map (110 points)
 | Rubric item | Where |
 |---|---|
 | Baseline, correctness, reproducibility (15) | `scripts/test.sh`, `data/raw/correctness.log`, `data/raw/env.txt`, this README, REPORT §1-2 |

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Environment capture for the SSD project.
-# Usage (from "SSD Performance Profiling/"): scripts/capture_env.sh > data/raw/env.txt
+# Usage (from SSD-Performance-Profiling/): scripts/capture_env.sh > data/raw/env.txt
 # Adapted from Project 2's capture_env.sh: adds the SSD (model, firmware,
 # bus, driver), the test volume (file system, free space, cluster size), and
 # the fio version. SMART/temperature need administrator rights: see

@@ -2,7 +2,7 @@
 # READ-ONLY storage diagnostics that need administrator rights. Changes
 # nothing: it only queries settings and health counters.
 # Run from an ADMINISTRATOR Git Bash:
-#   cd "/c/Users/hamay/Documents/AdvCompSys Project/Adv-Computer-Systems-Lab/SSD Performance Profiling"
+#   cd "/c/Users/hamay/Documents/AdvCompSys Project/Adv-Computer-Systems-Lab/SSD-Performance-Profiling"
 #   scripts/diag_admin.sh
 # Output: data/raw/diag_admin.txt
 set -u

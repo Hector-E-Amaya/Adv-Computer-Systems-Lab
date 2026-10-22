@@ -1,11 +1,18 @@
 # Project #3: SSD Performance Profiling
 ECSE 4320/6320 Advanced Computer Systems, class-wide project.
 
-**Report: [reports/REPORT.md](reports/REPORT.md).**
+**Start here: [reports/REPORT.md](reports/REPORT.md).** All tables:
+[reports/RESULTS_TABLES.md](reports/RESULTS_TABLES.md). AI-use note:
+[reports/AI-USE.md](reports/AI-USE.md).
 
 **Safety first: [reports/SAFETY.md](reports/SAFETY.md).** Tests touch only
 disposable files in `C:\fio-test\`, with direct I/O; never a raw device or
 partition.
+
+## Platform
+Samsung PM991a 512 GB NVMe (the laptop's system drive, behind Intel RST/VMD,
+BitLocker on), Windows 11, fio 3.43 (`windowsaio`, direct I/O). OS disk and
+CPU counters from `typeperf` serve as an independent cross-check.
 
 ## Layout
 - `configs/`        fio job files (one per run, written by the runner)
