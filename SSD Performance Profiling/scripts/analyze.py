@@ -266,7 +266,7 @@ a1.axhline(st.median(bw_mb), color=INK2, ls="--", lw=0.8)
 a1.text(t_s[-1], st.median(bw_mb) * 1.04, f"median {st.median(bw_mb):.0f} MB/s", ha="right", fontsize=7, color=INK2)
 a1.set_xlabel("time (s)")
 a1.set_ylabel("write MB/s (1 s)")
-a1.set_title("16 GiB sequential write: no SLC burst visible", loc="left", fontsize=9)
+a1.set_title("16 GiB sequential write: no burst visible through the ~140 MB/s cap", loc="left", fontsize=9)
 a2.plot(ts, [per[t] / 1e3 for t in ts], color=C[1], lw=1.2)
 a2.set_xlabel("time (s)")
 a2.set_ylabel("K IOPS (1 s, 4 jobs summed)")
@@ -276,8 +276,8 @@ first10 = st.mean(per[t] for t in ts[:10])
 last10 = st.mean(per[t] for t in ts[-10:])
 md += ["## 6. Device state", "",
        f"16 GiB sequential write (1 MiB, QD 8), 1 s samples: first second {bw_mb[0]:.0f} MB/s, median "
-       f"{st.median(bw_mb):.0f}, min {min(bw_mb):.0f}, max {max(bw_mb):.0f} MB/s over {len(bw_mb)} s. No SLC-cache "
-       f"burst is visible: the sustained cap applies from the start.",
+       f"{st.median(bw_mb):.0f}, min {min(bw_mb):.0f}, max {max(bw_mb):.0f} MB/s over {len(bw_mb)} s. No write-buffer "
+       f"burst is observable: the sustained cap applies from the first second, so it would hide any SLC burst.",
        f"120 s 4 KiB random write (QD 16): first 10 s mean {first10 / 1e3:.1f} K IOPS, last 10 s "
        f"{last10 / 1e3:.1f} K IOPS; min {min(per.values()) / 1e3:.1f} K, max {max(per.values()) / 1e3:.1f} K.",
        "SMART temperature 60 C at the admin diagnostic (data/raw/diag_admin.txt); not logged during runs.", ""]

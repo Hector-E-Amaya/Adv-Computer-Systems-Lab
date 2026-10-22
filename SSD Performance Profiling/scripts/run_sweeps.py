@@ -17,8 +17,8 @@ qd       4 KiB randread and randwrite, total QD 1..256 (numjobs <= 4 x
          reported (Little's Law)
 tail     30 s runs at mid QD (16) and at the knee QD, which is computed from
          the qd sweep (smallest QD reaching >= 90% of max IOPS)
-state    (a) 128 GiB sequential write to a separate file with a 1 s bandwidth
-         log (SLC cache exhaustion); (b) 300 s 4 KiB random write at QD 16
+state    (a) 16 GiB sequential write to a separate file with a 1 s bandwidth
+         log (SLC cache exhaustion); (b) 120 s 4 KiB random write at QD 16
          with a 1 s IOPS log (burst vs steady state)
 pitfall  buffered (page cache) vs direct reads; single-thread iodepth 32/64
          (requested vs effective QD)

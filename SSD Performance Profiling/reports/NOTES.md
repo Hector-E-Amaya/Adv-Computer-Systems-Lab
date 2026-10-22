@@ -146,6 +146,19 @@
 - **Batch 3 analysis cross-check:** Windows disk bytes/s / fio MB/s median
   1.005 (172 runs); Windows avg disk queue / fio effective QD median 0.96:
   two independent measures agree.
+- **Batch 4 review (report writing) fixes:**
+  - analyze.py's device-state plot title and RESULTS_TABLES section 6 still
+    said "no SLC burst visible" (contradicting concern 32). Reworded and
+    regenerated; only device_state.png and that line changed (other plots
+    byte-identical).
+  - The run_sweeps.py docstring still said 128 GiB / 300 s for the state
+    test; the code and raw JSON use 16 GiB / 120 s. Docstring fixed.
+  - REPORT draft errors caught in the cross-check: a Little's-Law tail
+    argument used 128 KiB arithmetic on a 4 KiB run, and an H4 note claimed
+    a mix fell below pure write. Both were rewritten from the table values.
+  - Every REPORT number was checked by script against RESULTS_TABLES /
+    NOTES; the remainder are roundings or arithmetic shown in the text.
+    All links and paths resolve.
 - run_sweeps.py printed nothing to the log until exit (Python output
   buffering when redirected): use `python -u` for live logs.
 
@@ -153,8 +166,9 @@
   system SSD).
   - SLC test 16 GiB (was 128); main test file 16 GiB (was 32: still far
     larger than any cache, and it halves the prep fill).
-  - Write-side sweep runs 5 s + 1 s ramp, with 3 reps kept; tail write runs
-    30 s (reads 60 s); steady state 120 s (was 300).
+  - Write-side sweep runs 5 s + 1 s ramp, with 3 reps kept; tail runs
+    30 s, reads and writes (an earlier plan had 60 s reads; the raw JSON
+    confirms 30 s); steady state 120 s (was 300).
   - **Correction:** a first estimate of "60-80 GB" was wrong. Summing
     every write-side run at the measured ~150 MB/s gives an upper estimate
     of **~163 GB** (~0.05% of ~300 TBW). Actual totals will be reported from

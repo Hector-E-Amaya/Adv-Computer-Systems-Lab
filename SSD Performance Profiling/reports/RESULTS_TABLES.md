@@ -97,7 +97,7 @@ Knee = smallest QD reaching >= 90% of the best IOPS: random read **QD 32**, rand
 
 ## 6. Device state
 
-16 GiB sequential write (1 MiB, QD 8), 1 s samples: first second 192 MB/s, median 140, min 44, max 192 MB/s over 133 s. No SLC-cache burst is visible: the sustained cap applies from the start.
+16 GiB sequential write (1 MiB, QD 8), 1 s samples: first second 192 MB/s, median 140, min 44, max 192 MB/s over 133 s. No write-buffer burst is observable: the sustained cap applies from the first second, so it would hide any SLC burst.
 120 s 4 KiB random write (QD 16): first 10 s mean 26.7 K IOPS, last 10 s 30.8 K IOPS; min 12.5 K, max 37.8 K.
 SMART temperature 60 C at the admin diagnostic (data/raw/diag_admin.txt); not logged during runs.
 
