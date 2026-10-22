@@ -241,6 +241,14 @@ Only the disassembly reveals it.
 
 ## 8. Limitations and anomalies
 
+- **Re-run check** (later session, fresh clone, 1 repetition;
+  [RECHECK](../../RECHECK_2026-10-22.md)): 96-98% of the 320 regime values
+  reproduced within 10% (median ratio 1.00). The largest shifts:
+  - stencil f32 in L3, -15 to -17% GFLOP/s;
+  - the avx512 L2 misalignment worst case, 1.54 -> 1.90x.
+  The L2 alignment cost is therefore session-sensitive. The L1 and DRAM
+  conclusions are not.
+
 - **No hardware counters** (Windows; perf unavailable). Cycles are derived
   from time and a measured clock, so any AVX-512 frequency licence during the
   timed loop is invisible. There is little sign of one: avx512 is >5% slower

@@ -20,7 +20,8 @@ fixes. The student's review contributions are in
   (110-116 K). Little's Law holds to within 1-5%, and Windows' own queue
   counter agrees (ratio 0.96).
 - The ceilings are far below the drive's specifications: reads **~0.70-0.75
-  GB/s**, writes **~90-150 MB/s**, at any block size. Neither is CPU- or
+  GB/s** (~0.5 GB/s in a same-day re-run, while 4 KiB results reproduced
+  within 3%), writes **~90-150 MB/s**, at any block size. Neither is CPU- or
   encryption-bound (total CPU median 18% for reads, 10% for writes). The
   limit sits on the device/link side, behind a driver that hides the PCIe
   link state. Its cause is not verified.
@@ -135,6 +136,17 @@ Interpretation:
   down-trained link (e.g. x1, or a lower PCIe generation) or a power-saving
   state. The VMD driver does not expose the link, so the cause is reported
   as a hypothesis, not a finding.
+- **The read ceiling is not fixed.** A re-run later the same day ran in the
+  same boot, on AC power, idle ([RECHECK](../../RECHECK_2026-10-22.md);
+  `data/raw/recheck_2026-10-22/`).
+  - Every 4 KiB result reproduced within 0-3%: QD=1 read 138.6 us both
+    times; the knee again at QD 32 (128.8 K IOPS).
+  - Large reads were 26-38% slower in every repetition: 128 KiB at QD=1 ran
+    at 540 vs 730 MB/s, and 1 MiB at QD 16 at 0.45-0.52 GB/s.
+  - A bandwidth ceiling that moves ~30% within one boot, while command
+    throughput stays put, points to a variable state (link power management
+    or thermal) rather than a fixed property of the drive. The cause is
+    still unverified.
 
 ## 3. Read/write mix and queue-depth analysis (rubric: 40)
 
@@ -365,8 +377,10 @@ write cap: the drop it looks for cannot be seen through the cap.
 - **System drive, file-level testing.** A raw device was not safe to use.
   Every number includes NTFS, BitLocker software encryption and the Intel
   RST/VMD driver, and may not match the PM991a measured raw on another host.
-- **The ceilings are unexplained.** The 0.75 GB/s read and ~0.15 GB/s write
-  ceilings are not CPU-bound, but the PCIe link state is invisible behind
+- **The ceilings are unexplained.** The read ceiling even moved between
+  sessions (0.75 to ~0.52 GB/s in a same-day re-run), so block-size
+  throughput numbers hold for the sweep session only. The 0.75 GB/s read and
+  ~0.15 GB/s write ceilings are not CPU-bound, but the PCIe link state is invisible behind
   VMD. A down-trained link, an aggressive power state, the driver path, or
   thermal state could each explain them. Verifying this would need firmware
   or BIOS access (e.g. disabling VMD), which is out of scope on a personal

@@ -8,7 +8,7 @@ DDR4-3200, a Samsung PM991a 512 GB NVMe SSD, and Windows 11 Home.
 |---|---|---|
 | #1 [SIMD Advantage Profiling](SIMD-Advantage-Profiling/) (110 pts) | [REPORT](SIMD-Advantage-Profiling/reports/REPORT.md) | SIMD speedup tracks lane count in L1 (saxpy f32 3.0x / 6.0x / 10.75x for SSE2 / AVX2 / AVX-512) and vanishes in DRAM (1.05x), where scalar code already saturates single-core bandwidth |
 | #2 [Cache & Memory Performance Profiling](Cache-Memory-Performance-Profiling/) (185 pts) | [REPORT](Cache-Memory-Performance-Profiling/reports/REPORT.md) | L1 / L2 / L3 latency 5.0 / 14.1 / ~40 cycles, DRAM 82.5 ns; loaded-latency knee at ~72-84% of the 25.6 GB/s peak; TLB steps confirmed by VTune counters |
-| #3 [SSD Performance Profiling](SSD-Performance-Profiling/) (185 pts) | [REPORT](SSD-Performance-Profiling/reports/REPORT.md) | QD=1 4 KiB random read 139 us; knee at QD 32 (126 K IOPS); Little's Law within 1-5%; device/link-side ceilings of ~0.75 GB/s read and ~0.15 GB/s write |
+| #3 [SSD Performance Profiling](SSD-Performance-Profiling/) (185 pts) | [REPORT](SSD-Performance-Profiling/reports/REPORT.md) | QD=1 4 KiB random read 139 us; knee at QD 32 (126 K IOPS); Little's Law within 1-5%; device/link-side ceilings of ~0.75 GB/s read (varies by session) and ~0.15 GB/s write |
 
 All three projects are complete.
 
@@ -38,6 +38,14 @@ Each project folder has the same layout:
   raw data; re-running it reproduces the committed outputs byte for byte.
 - Correctness suites: Project 1 `scripts/test.sh` (1121 checks), Project 2
   `scripts/test.sh` (366 checks).
+- **Independent re-run** ([RECHECK_2026-10-22.md](RECHECK_2026-10-22.md)): a
+  fresh clone, re-measured in a later session.
+  - Projects 1-2 reproduce with a median new/old ratio of 0.99-1.00 in every
+    table. 73-100% of values per table are within 10%; the lowest share is
+    in tables of maxima and variation coefficients.
+  - Project 3's 4 KiB results reproduce within 3%, but its large-read
+    bandwidth ceiling was ~30% lower. Each report discusses the values that
+    moved.
 - Project 3 never touches a raw device or partition: only disposable files in
   `C:\fio-test\` with direct I/O (`SSD-Performance-Profiling/reports/SAFETY.md`).
 
