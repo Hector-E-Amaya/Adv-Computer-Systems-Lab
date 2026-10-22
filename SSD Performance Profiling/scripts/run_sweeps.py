@@ -15,7 +15,7 @@ qd       4 KiB randread and randwrite, total QD 1..256 (numjobs <= 4 x
          iodepth); one fio thread is submission-bound at ~55 K IOPS
          (Batch 1), so depth is scaled with jobs and the effective QD is
          reported (Little's Law)
-tail     60 s runs at mid QD (16) and at the knee QD, which is computed from
+tail     30 s runs at mid QD (16) and at the knee QD, which is computed from
          the qd sweep (smallest QD reaching >= 90% of max IOPS)
 state    (a) 128 GiB sequential write to a separate file with a 1 s bandwidth
          log (SLC cache exhaustion); (b) 300 s 4 KiB random write at QD 16
