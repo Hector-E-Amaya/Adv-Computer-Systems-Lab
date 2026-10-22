@@ -45,7 +45,8 @@ REPS = 1 if QUICK else 3
 SUF = "_quick" if QUICK else ""
 MAIN = Path(r"C:\fio-test") / ("val_1g.dat" if QUICK else "testfile_16g.dat")
 MSIZE = (1 << 30) if QUICK else (16 << 30)  # 16 GiB: >> any cache; halves the prep fill (wear)
-T = dict(runtime=2, ramp_time=1) if QUICK else dict(runtime=15, ramp_time=3)
+# 8 s runs: even 4 KiB QD1 reads (~7 K IOPS) give ~56 K latency samples per run
+T = dict(runtime=2, ramp_time=1) if QUICK else dict(runtime=8, ramp_time=2)
 COMMON = dict(filename=str(MAIN), size=MSIZE, **T)
 failures = []
 
@@ -126,8 +127,8 @@ def knee_qd(rw):
 
 def sweep_tail():
     for rw in ("randread", "randwrite"):
-        # reads 60 s for p99.9 precision; writes 30 s (wear policy)
-        t = dict(runtime=4, ramp_time=1) if QUICK else dict(runtime=60 if rw == "randread" else 30, ramp_time=5)
+        # 30 s: >= 2 M samples at QD >= 16, enough for p99.9 (reads and writes)
+        t = dict(runtime=4, ramp_time=1) if QUICK else dict(runtime=30, ramp_time=3)
         k = knee_qd(rw)
         print(f"tail: {rw} knee QD = {k}" + (" (same as mid QD 16: knee run skipped)" if k == 16 else ""))
         points = [("mid", 16)] + ([("knee", k)] if k != 16 else [])
