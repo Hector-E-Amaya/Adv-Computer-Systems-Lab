@@ -85,6 +85,19 @@ Test-script bugs caught by running the suite (not measurement bugs): `bc`
 not installed (timing now via Python), and Windows Python needing an
 absolute exe path.
 
+Tooling/line-ending issues (no measurement impact):
+- Python `write_text` and pandas `to_csv` write CRLF on Windows. Some working
+  copies (test.sh, vtune_smoke.sh, Project 1 processed CSVs) had CRLF; the
+  committed copies were LF. All converted, and git confirms content-identical.
+- Root cause fixed in Project 1's analyze.py / verify_vec.py (explicit `\n`).
+  Re-running them reproduced every committed plot and CSV byte-for-byte.
+- An attempted scripted fix inserted real newlines into string literals (a
+  shell-escaping problem in how the assistant passed the command). The syntax
+  error was caught by parsing, the file restored, and the edit redone with
+  the file-edit tool. That attempt also showed a pattern matching 7 places
+  instead of 6, one of which was a `to_string` call it would have broken:
+  edits now use exact, unique patterns. Exit codes are checked explicitly.
+
 ### Correctness suite (`scripts/test.sh`, now 361 checks, all pass)
 - lat single-cycle check: random/seq/page modes, 128 B .. 256 MB.
 - **Mutation:** `lat_mutant` (Fisher-Yates instead of Sattolo, which can

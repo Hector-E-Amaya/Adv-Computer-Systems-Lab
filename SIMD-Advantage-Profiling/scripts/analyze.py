@@ -136,7 +136,7 @@ def size_sweep(d, out):
     s = summarize(d, keys).merge(speedups(d, keys), on=keys + ["build"])
     s["footprint"] = s.n * s.kernel.map(NBUF) * s.dtype.map(ESIZE)
     s["regime"] = s.footprint.map(regime)
-    s.to_csv(PROC / "size_summary.csv", index=False)
+    s.to_csv(PROC / "size_summary.csv", index=False, lineterminator="\n")
 
     for dt in ["f32", "f64"]:
         for metric, ylabel, fname, logy in [("gflops", "GFLOP/s", "size_gflops", True),
@@ -204,7 +204,7 @@ def size_sweep(d, out):
     r = s[s.regime != "transition"].groupby(["kernel", "dtype", "build", "regime"]).agg(
         speedup=("speedup", "median"), gflops=("gflops", "median"), cpe=("cpe", "median"),
         cv_pct=("cv_pct", "median"), points=("n", "count")).reset_index()
-    r.to_csv(PROC / "size_by_regime.csv", index=False)
+    r.to_csv(PROC / "size_by_regime.csv", index=False, lineterminator="\n")
     out["size"] = s
     out["regime"] = r
 
@@ -258,7 +258,7 @@ def align_sweep(d, out):
     s["rel_time"] = s.t_ns / s.t0
     s["rel_lo"], s["rel_hi"] = s.t_lo / s.t0, s.t_hi / s.t0  # rep spread, relative to aligned median
     s["regime"] = (s.n * s.kernel.map(NBUF) * s.dtype.map(ESIZE)).map(regime)
-    s.to_csv(PROC / "align_summary.csv", index=False)
+    s.to_csv(PROC / "align_summary.csv", index=False, lineterminator="\n")
     for dt in ["f32", "f64"]:
         ns = sorted(s.n.unique())
         fig, axes = plt.subplots(len(ns), 2, figsize=(9, 2.6 * len(ns)), squeeze=False)
@@ -280,7 +280,7 @@ def align_sweep(d, out):
 
 def tail_sweep(d, out):
     s = summarize(d, ["kernel", "dtype", "n"])
-    s.to_csv(PROC / "tail_summary.csv", index=False)
+    s.to_csv(PROC / "tail_summary.csv", index=False, lineterminator="\n")
     fig, axes = plt.subplots(1, 2, figsize=(11, 3.6))
     build_lines(axes[0], s, "n", "t_ns", "t_lo", "t_hi")
     axes[0].set_ylabel("ns per call")
@@ -303,7 +303,7 @@ def tail_sweep(d, out):
 def stride_sweep(d, out):
     keys = ["kernel", "dtype", "n", "stride"]
     s = summarize(d, keys).merge(speedups(d, keys), on=keys + ["build"])
-    s.to_csv(PROC / "stride_summary.csv", index=False)
+    s.to_csv(PROC / "stride_summary.csv", index=False, lineterminator="\n")
     ns = sorted(s.n.unique())
     fig, axes = plt.subplots(2, len(ns), figsize=(5 * len(ns), 6.4), squeeze=False)
     for j, n in enumerate(ns):
@@ -430,7 +430,7 @@ def hypotheses(out):
         add("H6", "avx2 f32 DRAM useful GB/s, stride 1 / stride 16", g.gbps.get(1) / g.gbps.get(16), 8, 20)
         add("H6", "avx2 f32 DRAM speedup at stride 2", g.speedup.get(2), 0.8, 1.2)
     t = pd.DataFrame(rows, columns=["hypothesis", "measure", "value", "predicted", "verdict"])
-    t.to_csv(PROC / "hypothesis_checks.csv", index=False)
+    t.to_csv(PROC / "hypothesis_checks.csv", index=False, lineterminator="\n")
     return t
 
 
@@ -464,7 +464,7 @@ def write_report(out, checks):
         md += ["## GFLOP/s by cache regime", "", md_table(g), ""]
         md += [f"Median run-to-run CV of time across repetitions: "
                f"{out['size'].cv_pct.median():.1f}% (95th pct {out['size'].cv_pct.quantile(0.95):.1f}%).", ""]
-    (REPORTS / "RESULTS_TABLES.md").write_text("\n".join(md) + "\n")
+    (REPORTS / "RESULTS_TABLES.md").write_text("\n".join(md) + "\n", newline="\n")
     print("  reports/RESULTS_TABLES.md")
 
 

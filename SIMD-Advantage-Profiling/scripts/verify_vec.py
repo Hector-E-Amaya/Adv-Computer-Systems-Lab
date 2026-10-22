@@ -153,7 +153,7 @@ def main():
     md += [f"- FAIL: {p}" for p in problems] or ["- All expectations met: scalar build has no vector code; "
                                                  "each SIMD build uses its full width for every unit-stride "
                                                  "kernel; the plain dot product keeps strict FP order."]
-    (ROOT / "reports" / "VECTORIZATION.md").write_text("\n".join(md) + "\n")
+    (ROOT / "reports" / "VECTORIZATION.md").write_text("\n".join(md) + "\n", newline="\n")
 
     for p in problems:
         print("FAIL", p)
