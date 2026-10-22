@@ -1,0 +1,57 @@
+# diag_admin 2026-10-22T12:32:47Z
+== Device write cache (IsDeviceCacheEnabled) ==
+PhysicalDisk         : MSFT_PhysicalDisk (ObjectId = "{1}\\HECTORAS-HP\root/Microsoft/Windows...)
+IsPowerProtected     : False
+IsDeviceCacheEnabled : True
+== BitLocker (encryption method, hardware vs software, status) ==
+BitLocker Drive Encryption: Configuration Tool version 10.0.26100
+Copyright (C) 2013 Microsoft Corporation. All rights reserved.
+
+Volume C: [Windows]
+[OS Volume]
+
+    Size:                 475.57 GB
+    BitLocker Version:    2.0
+    Conversion Status:    Used Space Only Encrypted
+    Percentage Encrypted: 100.0%
+    Encryption Method:    XTS-AES 128
+    Protection Status:    Protection On
+    Lock Status:          Unlocked
+    Identification Field: Unknown
+    Key Protectors:
+        Numerical Password
+        TPM
+
+== SMART / reliability counters (temperature, wear, writes) ==
+ObjectId                : {1}\\HECTORAS-HP\root/Microsoft/Windows/Storage/Providers_v2\SPACES_StorageR
+                          eliabilityCounter.ObjectId="{ad2eee33-b106-11ec-ad91-806e6f6e6963}:RC:{cf685
+                          29e-5aae-8112-b409-16c71e348a8c}"
+PassThroughClass        : 
+PassThroughIds          : 
+PassThroughNamespace    : 
+PassThroughServer       : 
+UniqueId                : {ad2eee33-b106-11ec-ad91-806e6f6e6963}:RC:{cf68529e-5aae-8112-b409-16c71e348
+                          a8c}
+DeviceId                : 0
+FlushLatencyMax         : 511
+LoadUnloadCycleCount    : 
+LoadUnloadCycleCountMax : 
+ManufactureDate         : 
+PowerOnHours            : 
+ReadErrorsCorrected     : 
+ReadErrorsTotal         : 
+ReadErrorsUncorrected   : 
+ReadLatencyMax          : 1744
+StartStopCycleCount     : 
+StartStopCycleCountMax  : 
+Temperature             : 60
+TemperatureMax          : 0
+Wear                    : 0
+WriteErrorsCorrected    : 
+WriteErrorsTotal        : 
+WriteErrorsUncorrected  : 
+WriteLatencyMax         : 1036
+PSComputerName          : 
+CimClass                : root/microsoft/windows/storage:MSFT_StorageReliabilityCounter
+CimInstanceProperties   : {ObjectId, PassThroughClass, PassThroughIds, PassThroughNamespace...}
+CimSystemProperties     : Microsoft.Management.Infrastructure.CimSystemProperties

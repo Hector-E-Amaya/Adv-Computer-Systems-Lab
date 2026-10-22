@@ -91,6 +91,14 @@
     cache; psync's did.
   - Direct QD1 was 126 us here vs 220 us earlier on the same file: session
     variation, hence 3 reps.
+- **Admin diagnostic** (data/raw/diag_admin.txt, read-only):
+  - **device write cache ENABLED**: rules out a disabled cache as the cause
+    of slow writes, consistent with fast QD1 writes;
+  - BitLocker XTS-AES 128, software, "Used Space Only Encrypted", 100%;
+  - SMART **temperature 60 C** right after the Batch 1 tests (warm; thermal
+    throttling stays a plausible but unproven cause of the ~150 MB/s
+    sustained write cap). TemperatureMax not reported. Wear 0%.
+  - Temperature during sweeps would need admin; not logged (limitation).
 - **Wear policy** (student: don't increase write volume aggressively;
   system SSD).
   - SLC test 16 GiB (was 128); main test file 16 GiB (was 32: still far
