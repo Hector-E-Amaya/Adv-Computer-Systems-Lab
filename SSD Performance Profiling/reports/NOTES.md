@@ -93,8 +93,11 @@
     variation, hence 3 reps.
 - **Wear policy** (student: don't increase write volume aggressively;
   system SSD).
-  - The SLC test is cut from 128 GiB to 16 GiB: the 1 s bandwidth log
-    already shows the drop within seconds.
-  - The steady random-write run is cut from 300 s to 120 s; write-side sweep
-    runs are cut to 8 s.
-  - Planned total host writes ~60-80 GB, tracked from fio's io_bytes.
+  - SLC test 16 GiB (was 128); main test file 16 GiB (was 32: still far
+    larger than any cache, and it halves the prep fill).
+  - Write-side sweep runs 5 s + 1 s ramp, with 3 reps kept; tail write runs
+    30 s (reads 60 s); steady state 120 s (was 300).
+  - **Correction:** a first estimate of "60-80 GB" was wrong. Summing
+    every write-side run at the measured ~150 MB/s gives an upper estimate
+    of **~163 GB** (~0.05% of ~300 TBW). Actual totals will be reported from
+    fio's io_bytes.

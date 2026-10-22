@@ -15,15 +15,14 @@ Rules, enforced by the scripts (Batch 1 adds checks for each):
 4. **Free-space floor.** A run refuses to start if creating or extending a
    test file would leave less than 100 GB free on C: (350 GB free at
    Step 1).
-5. **Test-file size:** 32 GiB for the main sweeps, far beyond any cache
-   (Windows page cache bypassed by direct I/O; host-memory buffer; SLC
-   cache only matters for writes and is studied separately). The
-   device-state (SLC exhaustion) test uses a separate, larger file, sized in
-   Batch 1 from the measured cache size and the free-space floor.
+5. **Test-file size:** 16 GiB for the main sweeps, far beyond any cache
+   (Windows page cache bypassed by direct I/O; no DRAM on the drive). The
+   device-state test writes a separate 16 GiB file.
 6. **Cleanup** of `C:\fio-test\` is done only on the student's
    instruction, and the files are disposable by definition.
 
-Wear: the planned total host writes are ~60-80 GB, against an endurance
-rating of roughly 300 TBW. Write volume was deliberately reduced after
-Batch 1 (student request; NOTES "wear policy"): SLC test 16 GiB, write-side
-sweep runs 8 s, steady-state run 120 s.
+Wear: planned total host writes are at most ~163 GB (~0.05% of a ~300 TBW
+endurance rating). Write volume was deliberately reduced after Batch 1
+(student request; NOTES "wear policy"): main file and SLC test 16 GiB,
+write-side sweep runs 5 s, tail writes 30 s, steady state 120 s. Actual
+totals are reported from fio's io_bytes.

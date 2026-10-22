@@ -3,7 +3,7 @@
   python scripts/run_sweeps.py [prep qd1 bs mix qd tail state pitfall | all]
   QUICK=1 python scripts/run_sweeps.py all   # smoke test: 1 GiB file, 2 s runs, 1 rep
 
-prep     fill the 32 GiB test file once with incompressible data (sequential
+prep     fill the 16 GiB test file once with incompressible data (sequential
          1 MiB writes), so every read hits written, mapped LBAs (reading
          never-written LBAs is a known pitfall: the SSD returns zeros without
          touching NAND)
@@ -43,14 +43,14 @@ ROOT = Path(__file__).resolve().parent.parent
 QUICK = os.environ.get("QUICK") == "1"
 REPS = 1 if QUICK else 3
 SUF = "_quick" if QUICK else ""
-MAIN = Path(r"C:\fio-test") / ("val_1g.dat" if QUICK else "testfile_32g.dat")
-MSIZE = (1 << 30) if QUICK else (32 << 30)
+MAIN = Path(r"C:\fio-test") / ("val_1g.dat" if QUICK else "testfile_16g.dat")
+MSIZE = (1 << 30) if QUICK else (16 << 30)  # 16 GiB: >> any cache; halves the prep fill (wear)
 T = dict(runtime=2, ramp_time=1) if QUICK else dict(runtime=15, ramp_time=3)
 COMMON = dict(filename=str(MAIN), size=MSIZE, **T)
 failures = []
 
 
-WRITE_T = dict(runtime=2, ramp_time=1) if QUICK else dict(runtime=8, ramp_time=2)  # wear policy
+WRITE_T = dict(runtime=2, ramp_time=1) if QUICK else dict(runtime=5, ramp_time=1)  # wear policy
 
 
 def run(sweep, name, rep, **p):
@@ -125,8 +125,9 @@ def knee_qd(rw):
 
 
 def sweep_tail():
-    t = dict(runtime=4, ramp_time=1) if QUICK else dict(runtime=60, ramp_time=5)
     for rw in ("randread", "randwrite"):
+        # reads 60 s for p99.9 precision; writes 30 s (wear policy)
+        t = dict(runtime=4, ramp_time=1) if QUICK else dict(runtime=60 if rw == "randread" else 30, ramp_time=5)
         k = knee_qd(rw)
         print(f"tail: {rw} knee QD = {k}" + (" (same as mid QD 16: knee run skipped)" if k == 16 else ""))
         points = [("mid", 16)] + ([("knee", k)] if k != 16 else [])
