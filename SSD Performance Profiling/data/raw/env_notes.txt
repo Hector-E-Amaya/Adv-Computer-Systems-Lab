@@ -1,0 +1,9 @@
+Manual notes (not detectable by script):
+- Same laptop as Projects 1-2 (Intel Core i3-1125G4, Windows 11 Home).
+- SSD: Samsung PM991a 512 GB (MZVLQ512HBLU), DRAM-less, PCIe 3.0 x4, behind
+  Intel RST/VMD (BusType "RAID"). Single usable partition C: (system drive).
+- Target: disposable files in C:\fio-test\ only, direct I/O (reports/SAFETY.md).
+- Windows power slider "Best performance", AC power, machine idle during runs.
+- SMART / temperature need administrator rights (optional admin snapshot).
+- fio: official Windows build from github.com/axboe/fio/releases, installed
+  by the student.
