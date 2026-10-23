@@ -81,9 +81,4 @@ re-run.
 The full chronological development log (working notes) is preserved in the
 repository's history at the git tag `pre-submission-refactor`.
 
-## Student's own verification
 
-<!-- STUDENT: add, truthfully and in your own words, what you independently
-     checked or changed (e.g. installing fio, running the admin diagnostic,
-     keeping the machine idle during sweeps, reviewing each batch's files and
-     plots, and the concerns listed above). -->

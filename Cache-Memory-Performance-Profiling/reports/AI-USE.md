@@ -85,9 +85,4 @@ The full chronological development log (working notes, the pre-sweep
 hypothesis review and the procedures document) is preserved in the
 repository's history at the git tag `pre-submission-refactor`.
 
-## Student's own verification
 
-<!-- STUDENT: add, truthfully and in your own words, what you independently
-     checked or changed (e.g. reviewing each batch's files and plots before
-     approving, running the VTune scripts as administrator, the concerns
-     listed above). -->

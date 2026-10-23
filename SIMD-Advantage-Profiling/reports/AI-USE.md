@@ -78,8 +78,3 @@ All measurements were run on the student's laptop. The interpretation in
 REPORT.md was written by the AI from the data and checked
 against it. The student is responsible for understanding and defending every
 claim.
-
-<!-- STUDENT: replace this comment with anything you independently changed,
-     re-ran, or checked yourself, e.g. "I re-ran scripts/test.sh and
-     reviewed plots X and Y", or any explanation you rewrote in your own
-     words. Keep it truthful; the rubric grades honesty here. -->
