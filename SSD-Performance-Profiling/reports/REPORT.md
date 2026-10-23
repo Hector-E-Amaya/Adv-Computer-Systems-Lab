@@ -384,6 +384,42 @@ against data. The student's challenges led to the claims that were
 retracted or reworded (CONTRIBUTIONS 25-32), most importantly the
 retraction of "BitLocker is the bottleneck".
 
+### Catalog: every case in this project where the optimization did not help or a naive setup would mislead
+
+Pitfalls 1 and 2 are featured. The table lists every such case found during
+the project. "Concern N" refers to the student's review log
+([CONTRIBUTIONS.md](CONTRIBUTIONS.md)). "Testing" means the assistant's own
+tests and review (NOTES.md).
+
+**A. The expected optimization did not help**
+
+| # | Expected | Measured | Why | Evidence |
+|---|---|---|---|---|
+| A1 | Deeper queues give more read IOPS | flat at 110-116 K past QD 32; mean latency 433 us -> 1.57 ms (QD 64 -> 256) | controller parallelism exhausted; extra commands only queue | Section 3b, `plots/qd_knee.png` |
+| A2 | Deeper queues give more write IOPS | 15-31 K IOPS at every QD; mean latency 61 us -> 10.5 ms | the sustained write cap; queue depth buys only latency | Section 3b |
+| A3 | Larger blocks give more write throughput | ~90-100 MB/s at every size from 16 KiB | every write pattern hits the same cap | Section 2, `plots/block_size.png` |
+| A4 | Larger blocks / more threads give more read throughput | 0.69-0.75 GB/s from 64 KiB up; 1 -> 4 threads flat at 618-766 MB/s (8-14% CPU) | device/link-side ceiling | Section 2 |
+| A5 | A few writes barely affect reads | 30% writes cut total IOPS by 45%; read p99 0.29 -> 1.9 ms | writes set the pace; reads queue behind them | Section 3a, `plots/rw_mix.png` |
+
+**B. A naive or AI-generated setup or claim would have misled**
+
+| # | Naive setup / claim | What it would have reported | Caught by, and fix | Evidence |
+|---|---|---|---|---|
+| B1 | Buffered I/O (`direct=0`) | page-cache speed: 23x the SSD (median); warm pass 4.7-5.1 GB/s, above anything this SSD delivers | direct I/O everywhere; kept as the featured pitfall | Pitfall 1, `plots/pitfalls.png` |
+| B2 | A buffered demo with fio's defaults | no effect at all (`invalidate=1` empties the cache), or a cache miss slower than direct (2.5 K IOPS) | testing: `invalidate=0` plus a warming pass | Pitfall 1, NOTES Batch 1 |
+| B3 | Buffered vs direct with different I/O engines | an engine difference mistaken for a cache effect | **concern 27**: same engine, cold vs warm: 10.7 K vs 189 K IOPS | Pitfall 1, CONTRIBUTIONS 27 |
+| B4 | One fio thread with a deep `iodepth` | a "knee" at the host's submission limit (~55 K IOPS; effective QD 19.9 / 36.5 for 32 / 64) | testing: 4 jobs (126 K at QD 32), effective QD in every table | Pitfall 2, `plots/pitfalls.png` |
+| B5 | Reading an unwritten test file | never-written LBAs can be returned without touching NAND | avoided by design: file filled once before any read (not measured) | Section 1, `scripts/run_sweeps.py` |
+| B6 | AI claim: "BitLocker is the bottleneck" | a wrong cause for the low ceilings | **concern 25**: read-only scaling test (flat throughput at 8-14% CPU); retracted | Section 2, CONTRIBUTIONS 25 |
+| B7 | AI wording: fast QD=1 writes "prove the SLC cache"; no burst "means no SLC cache" | two unsupported attributions | **concerns 28 and 32**: "write buffer"; burst "not observable through the cap" | Sections 1 and 4b |
+| B8 | Treating the 200 ms writes as glitches | a missed queueing effect | **concern 26**: 200 ms is p99, not a lone maximum; Little's Law predicts the tails | Section 4a, CONTRIBUTIONS 26 |
+| B9 | Short runs from an idle start | throughput that sustained load does not keep: 126 K IOPS (8 s) vs 102 K (30 s) at QD 32; 1 MiB reads 793 -> 563 MB/s within ~1.5 min | re-run check and read-only follow-up; reported as load-dependent | Sections 2 and 4a, `RECHECK_2026-10-22.md` |
+| B10 | Tail percentiles of mixed workloads from 8 s runs | p99 that swings between runs (70/30 write p99 0.14 vs 18.2 ms) | error bars; stated in the report | Section 3a |
+| B11 | Parsing whatever fio wrote | a failed run's error text read as results | testing: failed outputs quarantined as `*.json.failed`; parser stops on bad JSON | Section 5, NOTES Batch 1 |
+| B12 | Escaping ':' in every path | fio silently skipped the bandwidth log | testing: only `filename` is escaped | NOTES Batch 1 |
+| B13 | Measuring during activity (one status check) | a degraded pitfall repetition, and one that lost its cache | testing: run archived (`data/raw/pitfall_run1/`), quiet read-only re-run | Section 5, NOTES |
+| B14 | Assuming the requested QD is delivered | QD 256 requested, 176 effective (4 jobs) | effective QD reported (Little's Law, checked by Windows counters) | Sections 3b and 8 |
+
 ## 7. Hypotheses scorecard (from [HYPOTHESES.md](HYPOTHESES.md))
 
 | # | Prediction | Measured | Verdict |

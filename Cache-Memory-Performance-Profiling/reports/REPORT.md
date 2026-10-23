@@ -280,6 +280,46 @@ same number of lines packed into a few pages.
 AI use, and what was independently checked, corrected or rejected:
 [AI-USE.md](AI-USE.md).
 
+### Catalog: every case in this project where the optimization did not help or a naive setup would mislead
+
+The three cases above are featured. The table lists every such case found
+during the project. "Concern N" refers to the student's review log
+([CONTRIBUTIONS.md](CONTRIBUTIONS.md)). "Testing" means the assistant's own
+tests and review (NOTES.md).
+
+**A. The expected optimization did not help**
+
+| # | Expected | Measured | Why | Evidence |
+|---|---|---|---|---|
+| A1 | Pinning reduces latency noise | unpinned CV 0.65% vs pinned 4.63% on a quiet machine | the OS rarely migrates a thread on an idle laptop | Section 6 item 3; concern 20 |
+| A2 | More independent chains, more throughput | linear to K = 12 (5.68 GB/s), then flat (5.9 GB/s at K = 14-16) while per-chain latency rises 135 -> 175 ns | effective concurrency limit of ~12 per core | Section 4, `plots/mlp.png` |
+| A3 | More traffic past the knee, more bandwidth | latency 2.5-4x idle while DRAM bandwidth barely grows | queueing at the memory controller | Section 4, `plots/knee.png` |
+| A4 | Fetching fewer bytes per line is cheaper | 8 B/line gives the same line rate as 64 B (277 vs 305 M lines/s), so useful GB/s drops 8.8x | DRAM moves whole 64 B lines | Section 3 |
+| A5 | Regular stores stream like reads | 9.0 GB/s useful = 18.0 GB/s DRAM traffic (non-temporal 22.1) | read-for-ownership doubles the traffic | Section 3 |
+| A6 | Huge pages remove the TLB cost | not testable: SeLockMemoryPrivilege not granted on Windows 11 Home | stated, not claimed | Section 8 |
+
+**B. A naive or AI-generated setup or claim would have misled**
+
+| # | Naive setup / claim | What it would have reported | Caught by, and fix | Evidence |
+|---|---|---|---|---|
+| B1 | Sequential pointer chase as "latency" | 4.4 ns at 256 MB instead of 112.8 ns (26x under-report) | counters prove it is DRAM-resident (concern 15); random chase used | Section 6 item 1 |
+| B2 | Running sweeps while the machine is in use | median latency +12.8%, bandwidth -11.9% on flagged repetitions (30% of rows) | concern 14: CPU logger, run rejected, quiet re-run | Section 6 item 2, `data/raw/run1_interfered/` |
+| B3 | First `bw` tool (simple loop) | 10.1 GB/s single-thread "DRAM bandwidth", vs 20.8 GB/s from Project 1: a CPU limit | testing: rewritten twice, L1 1.5 G lines/s, so DRAM numbers are memory-bound | NOTES Batch 1, AI-USE |
+| B4 | Using `bw` for cache bandwidth | 83-102 GB/s in L1/L2 (true L1 429 GB/s): loop-bound | testing: reported as lower bounds; L1/L2 from Project 1's `peak.c` | Section 8, `plots/bandwidth_working_set.png` |
+| B5 | Page-mode TLB layout (AI's first design; the AI also dismissed the concern at first) | used 64 of 1024 L2 sets: "TLB cost" inflated up to 3x (8192 pages 26.7-44.5 vs 14.6 ns) | **concern 7**, confirmed by VTune; fixed, with a set-balance check and a failing mutant | Section 5, CONTRIBUTIONS 7 |
+| B6 | Demand-miss counter (`MEM_LOAD_RETIRED.L3_MISS`) as DRAM traffic | sees only ~54% of DRAM lines (prefetch hides the rest) | **concern 5**: `L2_LINES_IN.ALL` added (matches within 1.2%) | Section 5, scorecard H4 |
+| B7 | Correlation 0.96-0.98 as proof that one counter is better | difference between counters not significant (CI [-0.035, 0.362]) | **concern 24**: permutation and bootstrap tests; conclusion rests on line counts | Section 5 |
+| B8 | AI claim: "the K-chain plateau proves 12 fill buffers" | an overclaim (page walkers are an equal candidate) | **concern 17**: worded as an effective concurrency limit | Section 4 |
+| B9 | `loaded` traffic threads placed by plain CPU order | first sibling thread on the probe core's own SMT sibling: core contention, not memory queueing | testing: probe sibling kept free, regression test | NOTES Batch 2 gate |
+| B10 | Counting only lines touched for write mixes | DRAM traffic undercounted 2x (3 threads, 100% writes: 7.3 GB/s of lines = 14.7 GB/s DRAM) | testing: RFO model, validated by VTune within 2% | Section 3, NOTES Batch 2 gate |
+| B11 | Comparing single processes | DRAM latency minima differ 112-137 ns between processes (physical page placement) | testing: 3 interleaved processes, spread reported | Section 2, NOTES Batch 2 gate |
+| B12 | Idle latency measured right after heavy traffic | +7% (114 vs 106 ns), likely uncore clock state | testing: pause before idle points | NOTES Batch 1 |
+| B13 | Restarting each trial from the same node | re-walks a subset that L3 can keep (<= 2% at 512 MB) | testing: chase position persists, regression test | NOTES pre-sweep review |
+| B14 | AMAT from raw VTune fractions | 116-123% "DRAM" at 64-256 MB (counter multiplexing), and TLB cost counted twice (+17.7%) | testing: fractions normalised within buckets; pure t_L3 / t_DRAM solved | Sections 5 and 8, NOTES Batch 3 |
+| B15 | Knee curve connected in bandwidth order | a zig-zag at saturation | testing: points ordered by injection rate | NOTES Batch 3 |
+| B16 | AI claim: "kern saxpy is not vectorized at -O2" | a false finding (gcc named the copy `saxpy.constprop.0`) | testing: retracted; asm test matches specialised names | AI-USE, NOTES pre-sweep review |
+| B17 | One repetition per point | re-run TLB cost 2.61 ns at 1024 pages; 8 MB latency 32.6 ns | 9-process re-measure: 1.91-1.94 ns; 35.1-42.0 ns (8 MB is placement-sensitive) | Section 5, `RECHECK_2026-10-22.md` |
+
 ## 7. Hypotheses scorecard
 
 | | prediction | result | verdict |

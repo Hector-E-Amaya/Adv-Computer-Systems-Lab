@@ -239,6 +239,40 @@ Only the disassembly reveals it.
   207 GB/s, below what saxpy itself achieves, because it was capped by the
   single 512-bit ALU port. The fixed version measures 429 GB/s.
 
+### Catalog: every case in this project where the optimization did not help or a naive setup would mislead
+
+The featured cases above are the plain dot product and strided saxpy. The
+table lists every such case found during the project, with its evidence.
+"Caught by" means sweep data, the assistant's own testing and review
+(NOTES.md, AI-USE.md), or the student's review.
+
+**A. The expected optimization did not help**
+
+| # | Expected | Measured | Why | Evidence |
+|---|---|---|---|---|
+| A1 | SIMD speeds up the plain dot product | 0.97-1.08x in every build and regime; 4.03-4.06 cycles/element | strict FP order keeps a serial FP-add chain (4-cycle latency) | Section 7, `plots/dot_negative.png` |
+| A2 | SIMD speeds up strided saxpy | 0.90-1.07x at any stride >= 2 (11.1x at stride 1) | gcc vectorizes only the `stride == 1` path; other strides run scalar | Sections 5 and 7, `plots/stride.png` |
+| A3 | Wider vectors keep helping in DRAM | saxpy f32 1.05x for sse2, avx2 and avx512 alike | scalar code already reaches the ~20 GB/s DRAM roof | Section 4, `plots/locality_saxpy_f32.png` |
+| A4 | AVX-512 beats AVX2 in L3 | avx512 2.15x vs avx2 2.23x (saxpy f32 L3) | one L3 bandwidth limit for all widths | Section 4 |
+| A5 | AVX-512 doubles the FMA peak | 114.2 vs 116.8 GFLOP/s | this core has one 512-bit FMA unit | Section 6, `data/raw/peaks.csv` |
+| A6 | Wider vectors are always at least as fast | avx512 1.72-1.93x *slower* than aligned at any non-64 B offset (L1) | every 64-byte access splits two cache lines | Section 5, `plots/align_f32.png` |
+| A7 | AVX-512 handles tails with masks | 0 mask-register operands; at N=17, avx512 still costs 4.3x its N=128 per-element cost | gcc emits a 32-byte epilogue plus scalar code instead | Sections 3 and 5, `plots/tail.png` |
+| A8 | Scalar code reaches 4 FLOP/cycle (spec-style estimate) | 2.0 FLOP/cycle measured | multiply and add share ports 0/1 | Section 6 |
+
+**B. A naive or AI-generated setup or claim would have misled**
+
+| # | Naive setup / claim | What it would have reported | Caught by, and fix | Evidence |
+|---|---|---|---|---|
+| B1 | "Scalar" build with `-fno-tree-vectorize` but `-fopenmp-simd` | a vectorized baseline, so understated speedups | testing: gcc still vectorizes `omp simd` loops; flag removed, asm check added to `test.sh` | Section 3, AI-USE item 2 |
+| B2 | Trusting gcc's "loop vectorized" report | SIMD gains that do not exist (A1, A2) | review of the loop that actually runs | Section 7, `reports/VECTORIZATION.md` |
+| B3 | L1 bandwidth test with one add per load | 207 GB/s, below what saxpy itself achieved (401 GB/s) | testing: capped by the single 512-bit ALU port; rewritten (one FMA per two loads), 429 GB/s | Section 7, AI-USE item 5 |
+| B4 | AI analysis: "gcc emulates strided access with scalar loads plus inserts" | a wrong mechanism for A2 | review: the stride guard was found; corrected in ANALYSIS, NOTES and VECTORIZATION | AI-USE item 8, NOTES Batch 2 |
+| B5 | AI analysis draft: "AVX-512 is never slower than AVX2" (and three other errors) | false claims (plain dot: 4.46 vs 4.06 cycles/element) | cross-checking each cited number against `data/processed/` | AI-USE item 7 |
+| B6 | Correctness tolerance only at large N | a missing tail element in a 1M-element dot passes (inside the (n+8) eps bound) | mutation tests; tails tested at small N | AI-USE item 1, NOTES Batch 1 |
+| B7 | Windows text-mode output | CRLF line endings inside the raw CSV data | testing; binary stdout before the full sweeps | AI-USE item 4 |
+| B8 | One repetition per point | a re-run gave 1.90x (L2 misalignment) and 23.4 GFLOP/s (stencil L3) | 5-repetition re-measure: 1.48x and 28.1 GFLOP/s, matching the committed medians | Section 8, `RECHECK_2026-10-22.md` |
+| B9 | Cycles from a clock measured with scalar code | hides any AVX-512 frequency drop during the timed loop | stated as a limitation (little sign of one: 8 of 185 sizes) | Section 8 |
+
 ## 8. Limitations and anomalies
 
 - **Re-run check** (later session, fresh clone, 1 repetition;
