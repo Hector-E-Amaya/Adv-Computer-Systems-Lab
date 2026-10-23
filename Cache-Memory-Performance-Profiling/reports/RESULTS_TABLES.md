@@ -50,7 +50,7 @@ Little's Law: lines in flight = bandwidth x latency / 64 B (equals K by construc
 
 ## 4. Loaded latency and the knee
 
-Idle latency 113.8 ns; max measured DRAM bandwidth 23.6 GB/s (25.6 theoretical). Knee = bandwidth where probe latency first exceeds 1.5 x idle (METHODS.md). Little's Law uses the probe's latency as R for all requests (approximation) and counts prefetches in flight.
+Idle latency 113.8 ns; max measured DRAM bandwidth 23.6 GB/s (25.6 theoretical). Knee = bandwidth where probe latency first exceeds 1.5 x idle (REPORT section 1). Little's Law uses the probe's latency as R for all requests (approximation) and counts prefetches in flight.
 
 | traffic threads | knee GB/s | knee % of max measured | knee % of 25.6 | top GB/s | top latency ns | lines in flight at top |
 |---|---|---|---|---|---|---|

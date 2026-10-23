@@ -55,7 +55,7 @@ WRITE_T = dict(runtime=2, ramp_time=1) if QUICK else dict(runtime=5, ramp_time=1
 
 
 def run(sweep, name, rep, **p):
-    # Time-based write runs in the sweeps are shortened (wear policy, NOTES);
+    # Time-based write runs in the sweeps are shortened (wear policy, reports/SAFETY.md);
     # explicit runtimes (tail, state) are kept.
     rw = str(p.get("rw", ""))
     if ("write" in rw or rw in ("randrw", "rw")) and "runtime" not in p:
@@ -144,7 +144,7 @@ def sweep_state():
     logdir.mkdir(parents=True, exist_ok=True)
     # 16 GiB, not 128: the write path drains at ~150 MB/s and the 1 s log
     # already shows the drop within seconds; wear on the system SSD is kept
-    # low (NOTES: wear policy).
+    # low (wear policy, reports/SAFETY.md).
     slc = Path(r"C:\fio-test") / ("slc_quick.dat" if QUICK else "slc_test_16g.dat")
     size = (2 << 30) if QUICK else (16 << 30)
     run("state", "slc_seqwrite_1m", 1, filename=str(slc), size=size, rw="write", bs="1m", iodepth=8,

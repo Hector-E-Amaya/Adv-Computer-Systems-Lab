@@ -25,6 +25,7 @@ Rules, enforced by the scripts (Batch 1 adds checks for each):
 
 Wear: planned total host writes are at most ~163 GB (~0.05% of a ~300 TBW
 endurance rating). Write volume was deliberately reduced after Batch 1
-(student request; NOTES "wear policy"): main file and SLC test 16 GiB,
+(student request, the wear policy): main file and SLC test 16 GiB,
 write-side sweep runs 5 s, tail writes 30 s, steady state 120 s. Actual
-totals are reported from fio's io_bytes.
+totals from fio's io_bytes: 113.8 GB in the full sweeps, ~128 GB across all
+runs including validation, smoke tests and re-runs (REPORT section 1).

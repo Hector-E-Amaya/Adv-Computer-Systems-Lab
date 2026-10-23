@@ -4,7 +4,7 @@ For every row of data/raw/sweep_*.csv (each has t_start/t_end in epoch
 seconds), average each logical CPU's % busy from data/raw/cpu_log.csv
 (typeperf, 1 s samples) over the row's window, then take the busiest CPU the
 benchmark did NOT use. The row is flagged when that exceeds THRESHOLD
-(METHODS.md: 25%).
+(REPORT section 1: 25%).
 
 Benchmark CPUs come from the row itself:
   lat / kern: `cpu` (-1 = unpinned: the busiest CPU is assumed to be the

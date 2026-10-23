@@ -7,7 +7,7 @@
 # Takes about 35 minutes (each run: a few seconds of collection plus VTune's
 # "Finalizing results"). Do not press keys while it runs.
 #
-# Runs (same 9-event set validated by vtune_smoke.sh):
+# Runs (same 9-event set, validated in a one-time VTune smoke test before the sweeps):
 #   kern_<kernel>_<n>      saxpy / mul across footprints 16 KB .. 256 MB
 #                          -> misses and lines per element vs ns per element
 #   lat_random_<size>      random chase per level -> hit fractions for AMAT

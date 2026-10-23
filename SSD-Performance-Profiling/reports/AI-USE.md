@@ -14,7 +14,7 @@
   `fio_run.py`, `run_sweeps.py`, `parse_fio.py`, `analyze.py`,
   `diag_admin.sh`.
 - Every fio job file (`configs/`, written by the runner), the plots, and the
-  drafts of SAFETY, HYPOTHESES, NOTES and this REPORT.
+  drafts of SAFETY, HYPOTHESES and the REPORT.
 
 The work ran in batches the student approved one at a time. Each batch
 passed the correction gate the student made part of the workflow before
@@ -27,30 +27,26 @@ it was committed:
 Write volume and timing were set with the student's constraints in mind:
 system SSD, minimal wear, an idle machine during sweeps.
 
-## What was independently checked, corrected or rejected
-Full chronological record: [NOTES.md](NOTES.md). Attribution:
-[CONTRIBUTIONS.md](CONTRIBUTIONS.md) (items 25-32).
+## Student review contributions
+The student's constraints and review concerns, with what checking showed.
+Numbering continues from Project 2 (concerns 1-24). The REPORT's pitfall
+catalog (section 6) cites them as "concern N".
 
-**Raised by the student, and verified:**
-- **"BitLocker may not be the primary bottleneck" (25).** The AI had blamed
-  software encryption without evidence. A read-only scaling test showed
-  flat throughput at 8-14% CPU, and the claim was **retracted**. The ceiling
-  is device/link-side, cause unverified.
-- **Investigate the 200 ms writes without adding wear (26).** Existing data
-  alone showed the 200 ms is p99 (not a lone outlier), QD=1 writes are fast,
-  and the tails are queueing behind a sustained write cap. Write volume was
-  cut (16 GiB files, 5 s write runs, 120 s steady state).
-- **Like-for-like pitfall (27).** The original comparison mixed I/O
-  engines. Cold vs warm with the same engine (24x) proved the page cache is
-  the cause, and corrected an AI note that windowsaio buffered reads miss
-  the cache.
-- **Wording held to what the data prove (28, 32):** "write buffer", not
-  "SLC cache"; the burst is "not observable through the cap", not "no SLC
-  cache".
-- **Ceilings beyond normal limits (29).** Confirmed that writes are not
-  CPU-bound either. The candidate causes are reported as hypotheses.
-- **84 K vs 126 K IOPS (30)** and **whether the 272x write tail repeats
-  (31):** checked; different QD, and yes (195x / 272x / 272x).
+**Constraints set by the student:** never benchmark a partition with
+valuable data (disposable files only, `reports/SAFETY.md`); do not raise
+write volume aggressively on the system SSD (wear policy); keep the machine
+idle during sweeps.
+
+| # | Concern (student) | Verdict after checking | Outcome |
+|---|---|---|---|
+| 25 | "BitLocker may not be the primary bottleneck" | **valid; the AI's claim was unsupported** | read-only scaling test: throughput flat at ~620-770 MB/s from 1 to 4 threads at 8-14% CPU, so not CPU/encryption-bound; claim retracted |
+| 26 | Are the 200 ms writes outliers or tail percentiles? Investigate without adding wear | valid | from existing data only: 200 ms is p99 for large writes; QD=1 writes are fast; tails are queueing behind a sustained write cap; write volume reduced |
+| 27 | The buffered pitfall must compare like for like | valid: the engines differed | same file, block size, QD and engine, cold vs warm: 10.7 K vs 189 K IOPS (the cache, not the engine) |
+| 28 | Faster QD=1 writes don't prove an SLC cache | valid | reported as "write buffer / device write cache", not "SLC" |
+| 29 | Flat ~0.7 GB/s read and ~0.1 GB/s write ceilings suggest another bottleneck | valid | writes are not CPU-bound either (CPU median 10%); causes reported as hypotheses |
+| 30 | 84 K mix read IOPS vs 126 K peak: same conditions? | different QD | the mix is QD 16 (QD sweep at 16: 82.5-83.0 K); 126 K is QD 32 |
+| 31 | Does the 272x write tail repeat across trials? | yes | p99.9/p50 195x / 272x / 272x per repetition |
+| 32 | No initial write burst doesn't prove the SLC cache isn't working | valid | reported as "not observable through the ~140 MB/s cap" |
 
 **Caught by the AI's own testing and review** (examples):
 - one fio thread cannot fill a deep queue (effective QD 20 at iodepth 32),
@@ -62,7 +58,7 @@ Full chronological record: [NOTES.md](NOTES.md). Attribution:
   pass were added;
 - Windows command output with NUL characters made `env.txt` binary;
 - a missing `ramp_time` column broke the analysis;
-- MiB/s were reported as MB/s in NOTES;
+- MiB/s were reported as MB/s in the working notes;
 - a mislabelled table column and stale docstrings / plot titles that
   still said "SLC" were fixed.
 
@@ -82,9 +78,12 @@ during the run, another lost its cache) is archived in
 `data/raw/pitfall_run1/` as evidence and replaced by a quiet read-only
 re-run.
 
+The full chronological development log (working notes) is preserved in the
+repository's history at the git tag `pre-submission-refactor`.
+
 ## Student's own verification
 
 <!-- STUDENT: add, truthfully and in your own words, what you independently
      checked or changed (e.g. installing fio, running the admin diagnostic,
      keeping the machine idle during sweeps, reviewing each batch's files and
-     plots, and the concerns listed in CONTRIBUTIONS.md). -->
+     plots, and the concerns listed above). -->

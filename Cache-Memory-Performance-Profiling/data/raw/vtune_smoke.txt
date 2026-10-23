@@ -1,317 +1,0 @@
-# vtune smoke 2026-10-22T00:24:16Z, commit 6a9e324, results in build/vtune/smoke_20261021-202416
-# running: takes 2-4 minutes; VTune pauses while 'Finalizing results'. Do not press keys.
-Intel(R) VTune(TM) Profiler 2026.6.0 (build 633341) Command Line Tool
-Copyright (C) 2009 Intel Corporation. All rights reserved.
-## collect events: saxpy: build/kern.exe --kernel saxpy --n 16M --seconds 3
-vtune: Collection started. To stop the collection, either press CTRL-C or enter from another console window: vtune -r C:\Users\hamay\Documents\AdvCompSys Project\Adv-Computer-Systems-Lab\Cache-Memory-Performance-Profiling\build\vtune\smoke_20261021-202416\saxpy -command stop.
-kern,saxpy,16777216,134217728,4K,271,3.0013,0.66011,18.1789,3.5875,3.5992,2
-vtune: Collection stopped.
-vtune: Using result path `C:\Users\hamay\Documents\AdvCompSys Project\Adv-Computer-Systems-Lab\Cache-Memory-Performance-Profiling\build\vtune\smoke_20261021-202416\saxpy'
-vtune: Executing actions  0 %                                                  vtune: Executing actions  0 % Finalizing results                               vtune: Executing actions  0 % Finalizing the result                            vtune: Executing actions  0 % Clearing the database                            vtune: Executing actions  7 % Clearing the database                            vtune: Executing actions  7 % Loading raw data to the database                 vtune: Executing actions  7 % Loading 'systemcollector-24740-HectorAs-HP.sc' fivtune: Executing actions 12 % Loading 'systemcollector-24740-HectorAs-HP.sc' fivtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Loading 'sep1ec8.20261021T202419.607341.tb7' filevtune: Executing actions 12 % Updating precomputed scalar metrics              vtune: Executing actions 14 % Updating precomputed scalar metrics              vtune: Executing actions 14 % Processing profile metrics and debug information vtune: Executing actions 19 % Processing profile metrics and debug information vtune: Executing actions 19 % Setting data model parameters                    vtune: Executing actions 19 % Resolving module symbols                         vtune: Executing actions 19 % Resolving information for `sepdrv5.sys'          vtune: Executing actions 19 % Resolving information for `apphelp.dll'          vtune: Executing actions 19 % Resolving information for `intelppm.sys'         vtune: Executing actions 19 % Resolving information for `ucrtbase.dll'         vtune: Executing actions 19 % Resolving information for `ntdll.dll'            vtune: Executing actions 19 % Resolving information for `ntfs.sys'             vtune: Executing actions 19 % Resolving information for `kern.exe'             vtune: Executing actions 19 % Resolving information for `ntoskrnl.exe'         
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\drivers\sepdrv5.sys'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\ucrtbase.dll'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\apphelp.dll'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\drivers\intelppm.sys'.
-vtune: Executing actions 20 % Resolving information for `ntoskrnl.exe'         vtune: Executing actions 21 % Resolving information for `ntoskrnl.exe'         
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\ntdll.dll'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\drivers\ntfs.sys'.
-vtune: Executing actions 22 % Resolving information for `ntoskrnl.exe'         
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\ntoskrnl.exe'.
-vtune: Executing actions 22 % Resolving bottom user stack information          vtune: Executing actions 23 % Resolving bottom user stack information          vtune: Executing actions 23 % Resolving thread name information                vtune: Executing actions 24 % Resolving thread name information                vtune: Executing actions 24 % Resolving call target names for dynamic code     vtune: Executing actions 25 % Resolving call target names for dynamic code     vtune: Executing actions 25 % Resolving interrupt name information             vtune: Executing actions 26 % Resolving interrupt name information             vtune: Executing actions 26 % Processing profile metrics and debug information vtune: Executing actions 28 % Processing profile metrics and debug information vtune: Executing actions 29 % Processing profile metrics and debug information vtune: Executing actions 30 % Processing profile metrics and debug information vtune: Executing actions 30 % Setting data model parameters                    vtune: Executing actions 30 % Precomputing frequently used data                vtune: Executing actions 30 % Precomputing frequently used data                vtune: Executing actions 31 % Precomputing frequently used data                vtune: Executing actions 32 % Precomputing frequently used data                vtune: Executing actions 33 % Precomputing frequently used data                vtune: Executing actions 34 % Precomputing frequently used data                vtune: Executing actions 35 % Precomputing frequently used data                vtune: Executing actions 36 % Precomputing frequently used data                vtune: Executing actions 36 % Updating precomputed scalar metrics              vtune: Executing actions 37 % Updating precomputed scalar metrics              vtune: Executing actions 37 % Discarding redundant overtime data               vtune: Executing actions 39 % Discarding redundant overtime data               vtune: Executing actions 39 % Saving the result                                vtune: Executing actions 41 % Saving the result                                vtune: Executing actions 42 % Saving the result                                vtune: Executing actions 50 % Saving the result                                vtune: Executing actions 50 % Generating a report                              vtune: Executing actions 50 % Setting data model parameters                    vtune: Executing actions 75 % Setting data model parameters                    vtune: Executing actions 75 % Generating a report                              
-Collection and Platform Info
-----------------------------
-Parameter                 saxpy                                                         
-------------------------  --------------------------------------------------------------
-Application Command Line  build/kern.exe "--kernel" "saxpy" "--n" "16M" "--seconds" "3" 
-Operating System          Microsoft Windows 11                                          
-Computer Name             HectorAs-HP                                                   
-Result Size               18007101                                                      
-Collection start time     00:24:20 22/10/2026 UTC                                       
-Collection stop time      00:24:23 22/10/2026 UTC                                       
-Collector Type            Event-based sampling driver                                   
-
-CPU
----
-Parameter          saxpy                                          
------------------  -----------------------------------------------
-Name               Intel(R) microarchitecture code named Tigerlake
-Frequency          1996799256                                     
-Logical CPU Count  8                                              
-
-TSX Hotspots
-------------
-Parameter           saxpy     
-------------------  ----------
-Precise Clockticks  4458006687
-
-Summary
--------
-Elapsed Time:             3.178
-Paused Time:              0.0  
-CPU Time:                 3.069
-Average CPU Utilization:  1.000
-CPI Rate:                 2.459
-
-Event summary
--------------
-Hardware Event Type              Hardware Event Count:Self  Hardware Event Sample Count:Self  Events Per Sample  Precise:Self
--------------------------------  -------------------------  --------------------------------  -----------------  ------------
-INST_RETIRED.ANY                                4458006687                              2229  2000003                    True
-CPU_CLK_UNHALTED.THREAD                        10962016443                              5481  2000003                    True
-CPU_CLK_UNHALTED.REF_TSC                        6128009192                              3064  2000003                    True
-MEM_LOAD_RETIRED.L1_HIT                           50000150                                25  1000003                    True
-MEM_LOAD_RETIRED.L2_HIT                          240003600                               600  200003                     True
-MEM_LOAD_RETIRED.L3_HIT                            8201722                                41  100021                     True
-MEM_LOAD_RETIRED.L3_MISS                         307028898                              3069  50021                      True
-LONGEST_LAT_CACHE.MISS                           491214736                              2456  100003                     True
-L2_LINES_IN.ALL                                  582017460                              2910  100003                     True
-DTLB_LOAD_MISSES.WALK_COMPLETED                     400012                                 2  100003                     True
-vtune: Executing actions 100 % Generating a report                             vtune: Executing actions 100 % done                                            
-vtune: Using result path `C:\Users\hamay\Documents\AdvCompSys Project\Adv-Computer-Systems-Lab\Cache-Memory-Performance-Profiling\build\vtune\smoke_20261021-202416\saxpy'
-vtune: Executing actions  0 %                                                  vtune: Executing actions  0 % Finalizing results                               vtune: Executing actions 50 % Finalizing results                               vtune: Executing actions 50 % Generating a report                              vtune: Executing actions 50 % Setting data model parameters                    vtune: Executing actions 75 % Setting data model parameters                    vtune: Executing actions 75 % Generating a report                              vtune: Executing actions 100 % Generating a report                             vtune: Executing actions 100 % done                                            
-Process,Hardware Event Count:INST_RETIRED.ANY,Hardware Event Count:CPU_CLK_UNHALTED.THREAD,Hardware Event Count:CPU_CLK_UNHALTED.REF_TSC,Hardware Event Count:MEM_LOAD_RETIRED.L1_HIT,Hardware Event Count:MEM_LOAD_RETIRED.L2_HIT,Hardware Event Count:MEM_LOAD_RETIRED.L3_HIT,Hardware Event Count:MEM_LOAD_RETIRED.L3_MISS,Hardware Event Count:LONGEST_LAT_CACHE.MISS,Hardware Event Count:L2_LINES_IN.ALL,Hardware Event Count:DTLB_LOAD_MISSES.WALK_COMPLETED,PID
-kern.exe,4458006687,10962016443,6128009192,50000150,240003600,8201722,307028898,491214736,582017460,400012,24600
-PASS [saxpy]: all 9 events present, 1 data row(s), report saved to build/vtune/smoke_20261021-202416/saxpy.csv
-## collect events: page: build/lat.exe --size 32M --mode page --min-time 0.3 --trials 5
-vtune: Collection started. To stop the collection, either press CTRL-C or enter from another console window: vtune -r C:\Users\hamay\Documents\AdvCompSys Project\Adv-Computer-Systems-Lab\Cache-Memory-Performance-Profiling\build\vtune\smoke_20261021-202416\page -command stop.
-lat,page,33554432,8192,4K,1,8571069,5,43.1831,40.8562,48.6630,154.81,1.4821,3.5808,3.5891,2
-vtune: Collection stopped.
-vtune: Using result path `C:\Users\hamay\Documents\AdvCompSys Project\Adv-Computer-Systems-Lab\Cache-Memory-Performance-Profiling\build\vtune\smoke_20261021-202416\page'
-vtune: Executing actions  0 %                                                  vtune: Executing actions  0 % Finalizing results                               vtune: Executing actions  0 % Finalizing the result                            vtune: Executing actions  0 % Clearing the database                            vtune: Executing actions  7 % Clearing the database                            vtune: Executing actions  7 % Loading raw data to the database                 vtune: Executing actions  7 % Loading 'systemcollector-16692-HectorAs-HP.sc' fivtune: Executing actions 12 % Loading 'systemcollector-16692-HectorAs-HP.sc' fivtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Loading 'sep4ec0.20261021T202436.565988.tb7' filevtune: Executing actions 12 % Updating precomputed scalar metrics              vtune: Executing actions 14 % Updating precomputed scalar metrics              vtune: Executing actions 14 % Processing profile metrics and debug information vtune: Executing actions 19 % Processing profile metrics and debug information vtune: Executing actions 19 % Setting data model parameters                    vtune: Executing actions 19 % Resolving module symbols                         vtune: Executing actions 19 % Resolving information for `lat.exe'              vtune: Executing actions 19 % Resolving information for `fltmgr.sys'           vtune: Executing actions 19 % Resolving information for `sepdrv5.sys'          vtune: Executing actions 19 % Resolving information for `ntdll.dll'            vtune: Executing actions 19 % Resolving information for `kernelbase.dll'       vtune: Executing actions 19 % Resolving information for `intelppm.sys'         vtune: Executing actions 19 % Resolving information for `wdfilter.sys'         vtune: Executing actions 19 % Resolving information for `ucrtbase.dll'         vtune: Executing actions 19 % Resolving information for `ntoskrnl.exe'         
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\drivers\fltmgr.sys'.
-vtune: Executing actions 20 % Resolving information for `ntoskrnl.exe'         vtune: Executing actions 20 % Resolving information for `win32kfull.sys'       
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\drivers\sepdrv5.sys'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\drivers\intelppm.sys'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\drivers\wd\wdfilter.sys'.
-vtune: Executing actions 21 % Resolving information for `win32kfull.sys'       
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\ucrtbase.dll'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\kernelbase.dll'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\ntdll.dll'.
-vtune: Executing actions 22 % Resolving information for `win32kfull.sys'       
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\ntoskrnl.exe'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\win32kfull.sys'.
-vtune: Executing actions 22 % Resolving bottom user stack information          vtune: Executing actions 23 % Resolving bottom user stack information          vtune: Executing actions 23 % Resolving thread name information                vtune: Executing actions 24 % Resolving thread name information                vtune: Executing actions 24 % Resolving call target names for dynamic code     vtune: Executing actions 25 % Resolving call target names for dynamic code     vtune: Executing actions 25 % Resolving interrupt name information             vtune: Executing actions 26 % Resolving interrupt name information             vtune: Executing actions 26 % Processing profile metrics and debug information vtune: Executing actions 28 % Processing profile metrics and debug information vtune: Executing actions 29 % Processing profile metrics and debug information vtune: Executing actions 30 % Processing profile metrics and debug information vtune: Executing actions 30 % Setting data model parameters                    vtune: Executing actions 30 % Precomputing frequently used data                vtune: Executing actions 30 % Precomputing frequently used data                vtune: Executing actions 31 % Precomputing frequently used data                vtune: Executing actions 32 % Precomputing frequently used data                vtune: Executing actions 33 % Precomputing frequently used data                vtune: Executing actions 34 % Precomputing frequently used data                vtune: Executing actions 35 % Precomputing frequently used data                vtune: Executing actions 36 % Precomputing frequently used data                vtune: Executing actions 36 % Updating precomputed scalar metrics              vtune: Executing actions 37 % Updating precomputed scalar metrics              vtune: Executing actions 37 % Discarding redundant overtime data               vtune: Executing actions 39 % Discarding redundant overtime data               vtune: Executing actions 39 % Saving the result                                vtune: Executing actions 41 % Saving the result                                vtune: Executing actions 42 % Saving the result                                vtune: Executing actions 49 % Saving the result                                vtune: Executing actions 50 % Saving the result                                vtune: Executing actions 50 % Generating a report                              vtune: Executing actions 50 % Setting data model parameters                    vtune: Executing actions 75 % Setting data model parameters                    vtune: Executing actions 75 % Generating a report                              
-Collection and Platform Info
-----------------------------
-Parameter                 page                                                                           
-------------------------  -------------------------------------------------------------------------------
-Application Command Line  build/lat.exe "--size" "32M" "--mode" "page" "--min-time" "0.3" "--trials" "5" 
-Operating System          Microsoft Windows 11                                                           
-Computer Name             HectorAs-HP                                                                    
-Result Size               12973786                                                                       
-Collection start time     00:24:37 22/10/2026 UTC                                                        
-Collection stop time      00:24:39 22/10/2026 UTC                                                        
-Collector Type            Event-based sampling driver                                                    
-
-CPU
----
-Parameter          page                                           
------------------  -----------------------------------------------
-Name               Intel(R) microarchitecture code named Tigerlake
-Frequency          1996799285                                     
-Logical CPU Count  8                                              
-
-TSX Hotspots
-------------
-Parameter           page     
-------------------  ---------
-Precise Clockticks  496000744
-
-Summary
--------
-Elapsed Time:             2.483 
-Paused Time:              0.0   
-CPU Time:                 2.436 
-Average CPU Utilization:  1.000 
-CPI Rate:                 17.823
-
-Event summary
--------------
-Hardware Event Type              Hardware Event Count:Self  Hardware Event Sample Count:Self  Events Per Sample  Precise:Self
--------------------------------  -------------------------  --------------------------------  -----------------  ------------
-INST_RETIRED.ANY                                 496000744                               248  2000003                    True
-CPU_CLK_UNHALTED.THREAD                         8840013260                              4420  2000003                    True
-CPU_CLK_UNHALTED.REF_TSC                        4864007296                              2432  2000003                    True
-MEM_LOAD_RETIRED.L1_HIT                           16000048                                 8  1000003                    True
-MEM_LOAD_RETIRED.L2_HIT                            1600024                                 4  200003                     True
-MEM_LOAD_RETIRED.L3_HIT                           40008400                               200  100021                     True
-MEM_LOAD_RETIRED.L3_MISS                          13605712                               136  50021                      True
-LONGEST_LAT_CACHE.MISS                            34801044                               174  100003                     True
-L2_LINES_IN.ALL                                  106803204                               534  100003                     True
-DTLB_LOAD_MISSES.WALK_COMPLETED                   52001560                               260  100003                     True
-vtune: Executing actions 100 % Generating a report                             vtune: Executing actions 100 % done                                            
-vtune: Using result path `C:\Users\hamay\Documents\AdvCompSys Project\Adv-Computer-Systems-Lab\Cache-Memory-Performance-Profiling\build\vtune\smoke_20261021-202416\page'
-vtune: Executing actions  0 %                                                  vtune: Executing actions  0 % Finalizing results                               vtune: Executing actions 50 % Finalizing results                               vtune: Executing actions 50 % Generating a report                              vtune: Executing actions 50 % Setting data model parameters                    vtune: Executing actions 75 % Setting data model parameters                    vtune: Executing actions 75 % Generating a report                              vtune: Executing actions 100 % Generating a report                             vtune: Executing actions 100 % done                                            
-Process,Hardware Event Count:INST_RETIRED.ANY,Hardware Event Count:CPU_CLK_UNHALTED.THREAD,Hardware Event Count:CPU_CLK_UNHALTED.REF_TSC,Hardware Event Count:MEM_LOAD_RETIRED.L1_HIT,Hardware Event Count:MEM_LOAD_RETIRED.L2_HIT,Hardware Event Count:MEM_LOAD_RETIRED.L3_HIT,Hardware Event Count:MEM_LOAD_RETIRED.L3_MISS,Hardware Event Count:LONGEST_LAT_CACHE.MISS,Hardware Event Count:L2_LINES_IN.ALL,Hardware Event Count:DTLB_LOAD_MISSES.WALK_COMPLETED,PID
-lat.exe,496000744,8840013260,4864007296,16000048,1600024,40008400,13605712,34801044,106803204,52001560,10732
-PASS [page]: all 9 events present, 1 data row(s), report saved to build/vtune/smoke_20261021-202416/page.csv
-## collect memory-access: bw seq read 1 thread 256 MB
-vtune: Peak bandwidth measurement started.
-vtune: Peak bandwidth measurement finished.
-vtune: Collection started. To stop the collection, either press CTRL-C or enter from another console window: vtune -r C:\Users\hamay\Documents\AdvCompSys Project\Adv-Computer-Systems-Lab\Cache-Memory-Performance-Profiling\build\vtune\smoke_20261021-202416\dram -command stop.
-bw,seq,64,64,0,0,1,268435456,4K,3,16.7857,16.3556,17.9454,262.277,16.7857,3.2863,3.5472,2
-vtune: Collection stopped.
-vtune: Using result path `C:\Users\hamay\Documents\AdvCompSys Project\Adv-Computer-Systems-Lab\Cache-Memory-Performance-Profiling\build\vtune\smoke_20261021-202416\dram'
-vtune: Executing actions  0 %                                                  vtune: Executing actions  0 % Finalizing results                               vtune: Executing actions  0 % Finalizing the result                            vtune: Executing actions  0 % Clearing the database                            vtune: Executing actions  7 % Clearing the database                            vtune: Executing actions  7 % Loading raw data to the database                 vtune: Executing actions  7 % Loading 'systemcollector-25924-HectorAs-HP.sc' fivtune: Executing actions 12 % Loading 'systemcollector-25924-HectorAs-HP.sc' fivtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Loading 'sep15bc.20261021T202454.428661.tb7' filevtune: Executing actions 12 % Updating precomputed scalar metrics              vtune: Executing actions 14 % Updating precomputed scalar metrics              vtune: Executing actions 14 % Processing profile metrics and debug information vtune: Executing actions 19 % Processing profile metrics and debug information vtune: Executing actions 19 % Setting data model parameters                    vtune: Executing actions 19 % Resolving module symbols                         vtune: Executing actions 19 % Resolving information for `fltmgr.sys'           vtune: Executing actions 19 % Resolving information for `bw.exe'               vtune: Executing actions 19 % Resolving information for `apphelp.dll'          vtune: Executing actions 19 % Resolving information for `msvcrt.dll'           vtune: Executing actions 19 % Resolving information for `kernelbase.dll'       vtune: Executing actions 19 % Resolving information for `ucrtbase.dll'         vtune: Executing actions 19 % Resolving information for `sepdrv5.sys'          vtune: Executing actions 19 % Resolving information for `wdfilter.sys'         vtune: Executing actions 19 % Resolving information for `kernel32.dll'         
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\drivers\fltmgr.sys'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\apphelp.dll'.
-vtune: Executing actions 20 % Resolving information for `kernel32.dll'         vtune: Executing actions 20 % Resolving information for `intelppm.sys'         
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\kernelbase.dll'.
-vtune: Executing actions 20 % Resolving information for `ntfs.sys'             
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\msvcrt.dll'.
-vtune: Executing actions 20 % Resolving information for dangling locations     
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\ucrtbase.dll'.
-vtune: Executing actions 20 % Resolving information for `ntdll.dll'            vtune: Executing actions 21 % Resolving information for `ntdll.dll'            vtune: Executing actions 21 % Resolving information for `ntoskrnl.exe'         
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\drivers\wd\wdfilter.sys'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\drivers\sepdrv5.sys'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\kernel32.dll'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\drivers\intelppm.sys'.
-vtune: Executing actions 22 % Resolving information for `ntoskrnl.exe'         
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\drivers\ntfs.sys'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\ntdll.dll'.
-vtune: Warning: Cannot locate debugging information for file `c:\windows\system32\ntoskrnl.exe'.
-vtune: Executing actions 22 % Resolving bottom user stack information          vtune: Executing actions 23 % Resolving bottom user stack information          vtune: Executing actions 23 % Resolving thread name information                vtune: Executing actions 24 % Resolving thread name information                vtune: Executing actions 24 % Resolving call target names for dynamic code     vtune: Executing actions 25 % Resolving call target names for dynamic code     vtune: Executing actions 25 % Resolving interrupt name information             vtune: Executing actions 26 % Resolving interrupt name information             vtune: Executing actions 26 % Processing profile metrics and debug information vtune: Executing actions 27 % Processing profile metrics and debug information vtune: Executing actions 28 % Processing profile metrics and debug information vtune: Executing actions 29 % Processing profile metrics and debug information vtune: Executing actions 30 % Processing profile metrics and debug information vtune: Executing actions 31 % Processing profile metrics and debug information vtune: Executing actions 31 % Preparing output tree                            vtune: Executing actions 31 % Parsing columns in input tree                    vtune: Executing actions 32 % Parsing columns in input tree                    vtune: Executing actions 32 % Creating top-level columns                       vtune: Executing actions 32 % Creating top-level rows                          vtune: Executing actions 33 % Creating top-level rows                          vtune: Executing actions 33 % Setting data model parameters                    vtune: Executing actions 34 % Setting data model parameters                    vtune: Executing actions 34 % Precomputing frequently used data                vtune: Executing actions 34 % Precomputing frequently used data                vtune: Executing actions 35 % Precomputing frequently used data                vtune: Executing actions 36 % Precomputing frequently used data                vtune: Executing actions 37 % Precomputing frequently used data                vtune: Executing actions 38 % Precomputing frequently used data                vtune: Executing actions 39 % Precomputing frequently used data                vtune: Executing actions 39 % Updating precomputed scalar metrics              vtune: Executing actions 41 % Updating precomputed scalar metrics              vtune: Executing actions 41 % Discarding redundant overtime data               vtune: Executing actions 42 % Discarding redundant overtime data               vtune: Executing actions 42 % Saving the result                                vtune: Executing actions 44 % Saving the result                                vtune: Executing actions 46 % Saving the result                                vtune: Executing actions 50 % Saving the result                                vtune: Executing actions 50 % Generating a report                              vtune: Executing actions 50 % Setting data model parameters                    vtune: Executing actions 75 % Setting data model parameters                    vtune: Executing actions 75 % Generating a report                              Elapsed Time: 4.296s
-    CPU Time: 4.008s
-    Memory Bound: 43.1% of Pipeline Slots
-     | The metric value is high. This may indicate that a significant fraction
-     | of execution pipeline slots could be stalled due to demand memory load
-     | and stores. Explore the metric breakdown by memory hierarchy, memory
-     | bandwidth information, and correlation by memory objects.
-     |
-        L1 Bound: 1.9% of Clockticks
-        L2 Bound: 0.0% of Clockticks
-        L3 Bound: 9.2% of Clockticks
-         | This metric shows how often CPU was stalled on L3 cache, or contended
-         | with a sibling Core. Avoiding cache misses (L2 misses/L3 hits)
-         | improves the latency and increases performance.
-         |
-        DRAM Bound: 32.8% of Clockticks
-         | This metric shows how often CPU was stalled on the main memory
-         | (DRAM). Caching typically improves the latency and increases
-         | performance.
-         |
-            DRAM Bandwidth Bound: 89.9% of Elapsed Time
-             | The system spent much time heavily utilizing DRAM bandwidth.
-             | Improve data accesses to reduce cacheline transfers from/to
-             | memory using these possible techniques: 1) consume all bytes of
-             | each cacheline before it is evicted (for example, reorder
-             | structure elements and split non-hot ones); 2) merge compute-
-             | limited and bandwidth-limited loops; 3) use NUMA optimizations on
-             | a multi-socket system. Note: software prefetches do not help a
-             | bandwidth-limited application. Run Memory Access analysis to
-             | identify data structures to be allocated in High Bandwidth Memory
-             | (HBM), if available.
-             |
-        Store Bound: 0.2% of Clockticks
-    Loads: 2,208,866,264
-    Stores: 71,502,145
-    LLC Miss Count: 853,958,512
-    Total Memory Traffic, GB: 0.000
-        Read Traffic from Local Memory, GB: 0.000
-        Read Traffic from Remote Memory, GB: 0.000
-        Read Traffic from Sub-NUMA Memory, GB: 0.000
-        Write Memory Traffic, GB: 0.000
-    Average Latency (cycles): 217
-    Total Thread Count: 7
-    Paused Time: 0s
-
-Bandwidth Utilization
-Bandwidth Domain  Platform Maximum  Observed Maximum  Average  % of Elapsed Time with High BW Utilization(%)
-----------------  ----------------  ----------------  -------  ---------------------------------------------
-DRAM, GB/sec      24                          19.300   17.096                                          89.9%
-Collection and Platform Info
-    Application Command Line: build/bw.exe "--size" "256M" "--dur" "1" "--trials" "3" 
-    Operating System: Microsoft Windows 11
-    Computer Name: HectorAs-HP
-    Result Size: 35.8 MB 
-    Collection start time: 00:24:54 22/10/2026 UTC
-    Collection stop time: 00:24:59 22/10/2026 UTC
-    Collector Type: Event-based sampling driver
-    CPU
-        Name: Intel(R) microarchitecture code named Tigerlake
-        Frequency: 1.997 GHz
-        Logical CPU Count: 8
-        Max DRAM Single-Package Bandwidth: 24.000 GB/s
-        Cache Allocation Technology
-            Level 2 capability: not detected
-            Level 3 capability: not detected
-
-If you want to skip descriptions of detected performance issues in the report,
-enter: vtune -report summary -report-knob show-issues=false -r <my_result_dir>.
-Alternatively, you may view the report in the csv format: vtune -report
-<report_name> -format=csv.
-vtune: Executing actions 100 % Generating a report                             vtune: Executing actions 100 % done                                            
-vtune: Using result path `C:\Users\hamay\Documents\AdvCompSys Project\Adv-Computer-Systems-Lab\Cache-Memory-Performance-Profiling\build\vtune\smoke_20261021-202416\dram'
-vtune: Executing actions  0 %                                                  vtune: Executing actions  0 % Finalizing results                               vtune: Executing actions 50 % Finalizing results                               vtune: Executing actions 50 % Generating a report                              vtune: Executing actions 50 % Setting data model parameters                    vtune: Executing actions 75 % Setting data model parameters                    vtune: Executing actions 75 % Generating a report                              vtune: Executing actions 100 % Generating a report                             vtune: Executing actions 100 % done                                            
-Elapsed Time: 4.296s
-    CPU Time: 4.008s
-    Memory Bound: 43.1% of Pipeline Slots
-     | The metric value is high. This may indicate that a significant fraction
-     | of execution pipeline slots could be stalled due to demand memory load
-     | and stores. Explore the metric breakdown by memory hierarchy, memory
-     | bandwidth information, and correlation by memory objects.
-     |
-        L1 Bound: 1.9% of Clockticks
-        L2 Bound: 0.0% of Clockticks
-        L3 Bound: 9.2% of Clockticks
-         | This metric shows how often CPU was stalled on L3 cache, or contended
-         | with a sibling Core. Avoiding cache misses (L2 misses/L3 hits)
-         | improves the latency and increases performance.
-         |
-        DRAM Bound: 32.8% of Clockticks
-         | This metric shows how often CPU was stalled on the main memory
-         | (DRAM). Caching typically improves the latency and increases
-         | performance.
-         |
-            DRAM Bandwidth Bound: 89.9% of Elapsed Time
-             | The system spent much time heavily utilizing DRAM bandwidth.
-             | Improve data accesses to reduce cacheline transfers from/to
-             | memory using these possible techniques: 1) consume all bytes of
-             | each cacheline before it is evicted (for example, reorder
-             | structure elements and split non-hot ones); 2) merge compute-
-             | limited and bandwidth-limited loops; 3) use NUMA optimizations on
-             | a multi-socket system. Note: software prefetches do not help a
-             | bandwidth-limited application. Run Memory Access analysis to
-             | identify data structures to be allocated in High Bandwidth Memory
-             | (HBM), if available.
-             |
-        Store Bound: 0.2% of Clockticks
-    Loads: 2,208,866,264
-    Stores: 71,502,145
-    LLC Miss Count: 853,958,512
-    Total Memory Traffic, GB: 0.000
-        Read Traffic from Local Memory, GB: 0.000
-        Read Traffic from Remote Memory, GB: 0.000
-        Read Traffic from Sub-NUMA Memory, GB: 0.000
-        Write Memory Traffic, GB: 0.000
-    Average Latency (cycles): 217
-    Total Thread Count: 7
-    Paused Time: 0s
-
-Bandwidth Utilization
-Bandwidth Domain  Platform Maximum  Observed Maximum  Average  % of Elapsed Time with High BW Utilization(%)
-----------------  ----------------  ----------------  -------  ---------------------------------------------
-DRAM, GB/sec      24                          19.300   17.096                                          89.9%
-Collection and Platform Info
-    Application Command Line: build/bw.exe "--size" "256M" "--dur" "1" "--trials" "3" 
-    Operating System: Microsoft Windows 11
-    Computer Name: HectorAs-HP
-    Result Size: 35.8 MB 
-    Collection start time: 00:24:54 22/10/2026 UTC
-    Collection stop time: 00:24:59 22/10/2026 UTC
-    Collector Type: Event-based sampling driver
-    CPU
-        Name: Intel(R) microarchitecture code named Tigerlake
-        Frequency: 1.997 GHz
-        Logical CPU Count: 8
-        Max DRAM Single-Package Bandwidth: 24.000 GB/s
-        Cache Allocation Technology
-            Level 2 capability: not detected
-            Level 3 capability: not detected
-
-If you want to skip descriptions of detected performance issues in the report,
-enter: vtune -report summary -report-knob show-issues=false -r <my_result_dir>.
-Alternatively, you may view the report in the csv format: vtune -report
-<report_name> -format=csv.
-PASS [dram]: memory-access analysis reports DRAM bandwidth
-ALL CHECKS PASSED -> data/raw/vtune_smoke.txt

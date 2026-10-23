@@ -20,7 +20,7 @@ only after its checks passed.
 | Step 2 | `reports/HYPOTHESES.md` text and README (content dictated by the student's commit script) |
 | 1 | `src/kernels.{c,h}`, `src/bench.c`, `scripts/build.sh`, `scripts/test.sh` |
 | 2 | `scripts/verify_vec.py`, `scripts/run_sweeps.sh`, `src/peak.c`, `scripts/analyze.py` |
-| 3 | `reports/ANALYSIS.md` |
+| 3 | the long-form analysis draft (folded into `reports/REPORT.md` for submission) |
 | 4 | plot polish, `reports/REPORT.md`, this file, README |
 
 The student set the project direction and the batch workflow. The student
@@ -31,8 +31,9 @@ was checked against.
 ## What was tested, corrected or rejected
 
 These problems were caught by testing and inspection during the project,
-not taken on trust from generated code. Each is recorded in
-`reports/NOTES.md` and the git history.
+not taken on trust from generated code. Each is recorded in the git history;
+the full working notes are preserved at the git tag
+`pre-submission-refactor`.
 
 1. **The tests were tested.** The correctness suite (1121 checks) was
    validated by building deliberately broken kernels: an off-by-one tail in
@@ -66,15 +67,15 @@ not taken on trust from generated code. Each is recorded in
 8. **Wrong explanation of strided code.** The first version said gcc
    "emulates strided access with scalar loads plus inserts". Reading the
    loop that actually runs for stride > 1 showed that gcc versions the loop
-   on `stride == 1` and runs plain scalar code otherwise. Corrected in
-   ANALYSIS.md, NOTES.md and the vectorization report.
+   on `stride == 1` and runs plain scalar code otherwise. Corrected in the
+   analysis, the notes and the vectorization report.
 9. **Git scope.** An early `git add -A` would have staged files outside the
    project folder. Later commits stage only `SIMD-Advantage-Profiling/`.
 
 ## What remains the student's responsibility
 
 All measurements were run on the student's laptop. The interpretation in
-REPORT.md and ANALYSIS.md was written by the AI from the data and checked
+REPORT.md was written by the AI from the data and checked
 against it. The student is responsible for understanding and defending every
 claim.
 

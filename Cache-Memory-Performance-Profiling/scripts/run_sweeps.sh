@@ -18,7 +18,7 @@
 #
 # Env: REPS (default 3) full repetitions; QUICK=1 for a short smoke run
 # (1 rep, few points, writes *_quick.csv and cpu_log_quick.csv).
-# Order (METHODS.md): repetition loop outermost, variants innermost. Idle
+# Order (REPORT section 1): repetition loop outermost, variants innermost. Idle
 # latency points get a 2 s pause first. Every tool's exit status is checked;
 # invalid rows are counted and the script exits nonzero if there are any.
 set -uo pipefail
@@ -144,7 +144,7 @@ sweep_knee() {
     local delays=(0 1 2 5 10 20 50 100 200 500 1000 2000) threads=(1 2 3 5 6) mixes=(0 30 50 100)
     [ "$QUICK" = 1 ] && delays=(0 100) && threads=(1 3) && mixes=(0 100)
     for ((rep = 1; rep <= REPS; rep++)); do
-        sleep 2 # idle point never right after heavy traffic (METHODS.md)
+        sleep 2 # idle point never right after heavy traffic (REPORT section 1)
         point $rep loaded --threads 0
         for d in "${delays[@]}"; do
             for th in "${threads[@]}"; do

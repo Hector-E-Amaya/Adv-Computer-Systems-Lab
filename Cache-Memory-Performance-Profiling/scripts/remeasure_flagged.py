@@ -1,6 +1,6 @@
 """Re-measure interference-flagged rows of the latency-sensitive sweeps.
 
-Run 2 evidence (NOTES.md): flags on single-thread latency rows (ws, tlb,
+Run 2 evidence (REPORT section 6): flags on single-thread latency rows (ws, tlb,
 pinned pin) and single-thread bw rows came with measurably biased values.
 Flags on rows using >= 4 logical CPUs (bw 4 threads, knee) showed no
 measurable effect (flagged/unflagged ~1.00), and unpinned `pin` rows are

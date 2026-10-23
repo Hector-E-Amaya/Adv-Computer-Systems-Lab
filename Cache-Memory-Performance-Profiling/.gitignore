@@ -1,5 +1,4 @@
-build/*
-!build/.gitkeep
+build/
 *.o
 *.out
 __pycache__/

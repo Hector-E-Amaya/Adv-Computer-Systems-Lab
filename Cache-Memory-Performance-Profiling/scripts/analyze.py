@@ -265,7 +265,7 @@ write_csv("knee.csv", ["traffic_threads", "knee_gbps", "knee_pct_of_max_measured
                        "top_latency_ns", "littles_law_lines_at_top"], kbody)
 md += ["## 4. Loaded latency and the knee", "",
        f"Idle latency {idle:.1f} ns; max measured DRAM bandwidth {peak:.1f} GB/s (25.6 theoretical). "
-       "Knee = bandwidth where probe latency first exceeds 1.5 x idle (METHODS.md). Little's Law uses "
+       "Knee = bandwidth where probe latency first exceeds 1.5 x idle (REPORT section 1). Little's Law uses "
        "the probe's latency as R for all requests (approximation) and counts prefetches in flight.",
        ""]
 md += table(["traffic threads", "knee GB/s", "knee % of max measured", "knee % of 25.6", "top GB/s", "top latency ns",
